@@ -1,2 +1,2 @@
 [alias]
-contract-build = "build --release --target=wasm32-unknown-unknown"
+wasm = "build --release --target=wasm32-unknown-unknown"
