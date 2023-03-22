@@ -1,0 +1,9 @@
+[package]
+name = "we-contract-sdk"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+we-contracts-proc-macro = { version = "0.1.0", path = "proc-macro" }
