@@ -8,6 +8,10 @@ edition = "2021"
 [lib]
 proc-macro = true
 
+[profile.release]
+lto = true
+opt-level = 'z'
+
 [dependencies]
 syn = { version = "1.0.102", features = ["full"] }
 quote = "1.0.21"
