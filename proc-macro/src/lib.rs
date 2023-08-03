@@ -13,10 +13,12 @@ pub fn action(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     quote!(
         #[no_mangle]
-        pub extern "C" fn #action_name (#action_args) {
+        pub extern "C" fn #action_name (#action_args) -> i32 {
             unsafe {
                 #action_block
             }
+
+            0
         }
     )
     .into()
