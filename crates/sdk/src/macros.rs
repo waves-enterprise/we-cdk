@@ -61,6 +61,39 @@ macro_rules! base58 {
     };
 }
 
+/// Call contract
+///
+/// # Usage
+/// ```
+/// use we_contract_sdk::*;
+/// #[interface]
+/// trait i_contract {
+///     fn method(integer: Integer, boolean: Boolean, binary: Binary, string: String, payment: Payment);
+/// }
+///
+/// #[action]
+/// fn _constructor() {
+///     let contract = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
+///     let asset = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///
+///     let integer: Integer = 42;
+///     let boolean: Boolean = true;
+///     let binary: Binary = &[0, 1];
+///     let string: String = "test";
+///     let payment: Payment = (asset, 2400000000);
+///
+///     call_contract! {
+///         i_contract(contract) => method(integer, boolean, binary, string, payment)
+///     };
+/// }
+/// ```
+#[macro_export]
+macro_rules! call_contract {
+    ($interface:ident ( $contract_id:expr ) => $func_name:ident ( $($args:expr),* )) => {
+        error_handling!($interface::$func_name($contract_id, $($args),* ));
+    };
+}
+
 /// Get storage
 ///
 /// # Usage
