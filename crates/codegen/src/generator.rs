@@ -9,7 +9,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
 
     for item in input.items {
         if let syn::TraitItem::Method(method) = item {
-            let func_name_str = stringify!(method.sig.ident);
+            let func_name_str = method.sig.ident.to_string();
             let func_name = method.sig.ident;
 
             let mut args: Vec<TokenStream2> = vec![];
