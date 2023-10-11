@@ -44,11 +44,11 @@ fn _constructor() {
 
     // Converting a string address to a byte address.
     let address = base58!("3NqEjAkFVzem9CGa3bEPhakQc1Sm2G8gAFU");
-    let balance = get_balance!(own);
+    let balance = get_balance!(this);
 
     // Verify inputs and conditions.
     // In this case, a balance check is performed.
-    require!(balance > 0);
+    require!(balance > 42);
     // Transfer of funds to the `address`.
     transfer!(address, 42);
 }

@@ -27,7 +27,7 @@ macro_rules! error_handling_tuple {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let balance = get_balance!(own);
+///     let balance = get_balance!(this);
 ///     require!(balance > 0);
 /// }
 /// ```
@@ -184,18 +184,18 @@ macro_rules! set_storage {
 ///     let token = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
 ///     let another_address = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
 ///
-///     let contract_balance = get_balance!(own);
-///     let contract_asset_balance = get_balance!(own, asset => token);
+///     let contract_balance = get_balance!(this);
+///     let contract_asset_balance = get_balance!(this, asset => token);
 ///     let address_balance = get_balance!(address => another_address);
 ///     let address_asset_balance = get_balance!(address => another_address, asset => token);
 /// }
 /// ```
 #[macro_export]
 macro_rules! get_balance {
-    (own) => {
+    (this) => {
         error_handling_tuple!(get_balance(&[], &[]))
     };
-    (own, asset => $asset_id:expr) => {
+    (this, asset => $asset_id:expr) => {
         error_handling_tuple!(get_balance($asset_id, &[]))
     };
     (address => $address:expr) => {
