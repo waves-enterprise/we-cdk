@@ -2,6 +2,12 @@
 name = "we-contract-proc-macro"
 version = "0.1.0"
 edition = "2021"
+authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
+description = "SDK macro for generating code for WASM contracts"
+license = "MIT"
+readme = "README.md"
+homepage = ""
+repository = ""
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

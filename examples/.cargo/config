@@ -1,8 +1,0 @@
-[alias]
-wasm = "build --release --target=wasm32-unknown-unknown"
-
-[target.wasm32-unknown-unknown]
-rustflags = [
-    "-C", "target-feature=+atomics,+mutable-globals,+bulk-memory,+multivalue",
-    "-C", "link-args=--no-entry --import-memory -zstack-size=16 --initial-memory=131072 --max-memory=1048576",
-]

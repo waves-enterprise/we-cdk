@@ -1,9 +1,9 @@
 [package]
-name = "we-contract-codegen"
+name = "cargo-we"
 version = "0.1.0"
 edition = "2021"
 authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
-description = "WEVM bindings and algorithms for intermediate representation"
+description = "Setup and deployment tool for developing WASM based smart-contracts"
 license = "MIT"
 readme = "README.md"
 homepage = ""
@@ -11,11 +11,6 @@ repository = ""
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[profile.release]
-lto = true
-opt-level = 'z'
-
 [dependencies]
-proc-macro2 = "1"
-syn = { version = "1", features = ["full"] }
-quote = "1"
+cargo_metadata = "0.18.0"
+clap = { version = "4.4.6", features = ["derive"] }
