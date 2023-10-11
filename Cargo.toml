@@ -5,5 +5,5 @@ members = [
     "crates/codegen",
     "crates/proc-macro",
     "crates/sdk",
-    "examples"
+    "examples/*"
 ]

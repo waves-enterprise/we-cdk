@@ -12,7 +12,6 @@ trait i_contract {
         string: String,
         payment: Payment,
     );
-    fn close();
 }
 
 // Declaring a function available for calling.
@@ -41,14 +40,4 @@ fn _constructor() {
     call_contract! {
         i_contract(contract) => function(integer, boolean, binary, string, payment)
     };
-
-    // Converting a string address to a byte address.
-    let address = base58!("3NqEjAkFVzem9CGa3bEPhakQc1Sm2G8gAFU");
-    let balance = get_balance!(this);
-
-    // Verify inputs and conditions.
-    // In this case, a balance check is performed.
-    require!(balance > 42);
-    // Transfer of funds to the `address`.
-    transfer!(address, 42);
 }

@@ -1,5 +1,5 @@
 [package]
-name = "example"
+name = "call_contract"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,4 +17,4 @@ panic = 'abort'
 strip = true
 
 [dependencies]
-we-contract-sdk = { version = "0.1.0", path = "../crates/sdk" }
+we-contract-sdk = { version = "0.1.0", path = "../../crates/sdk" }
