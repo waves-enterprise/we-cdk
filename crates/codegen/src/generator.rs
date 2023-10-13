@@ -49,7 +49,10 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        call_arg_binary(#arg_name);
+                                        let result = call_arg_binary(#arg_name);
+                                        if result != 0 {
+                                            return result;
+                                        }
                                     ));
                                 }
                                 "String" => {
@@ -58,16 +61,10 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        call_arg_string(#arg_name);
-                                    ));
-                                }
-                                "Payment" => {
-                                    args.push(quote!(
-                                        #arg_name: (&[u8], i64)
-                                    ));
-
-                                    call_args.push(quote!(
-                                        call_payment(#arg_name.0, #arg_name.1);
+                                        let result = call_arg_string(#arg_name);
+                                        if result != 0 {
+                                            return result;
+                                        }
                                     ));
                                 }
                                 _ => (),

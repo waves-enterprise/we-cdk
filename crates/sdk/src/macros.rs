@@ -90,7 +90,7 @@ macro_rules! to_base58_string {
 /// use we_contract_sdk::*;
 /// #[interface]
 /// trait i_contract {
-///     fn method(integer: Integer, boolean: Boolean, binary: Binary, string: String, payment: Payment);
+///     fn method(integer: Integer, boolean: Boolean, binary: Binary, string: String);
 /// }
 ///
 /// #[action]
@@ -105,14 +105,19 @@ macro_rules! to_base58_string {
 ///     let payment: Payment = (asset, 2400000000);
 ///
 ///     call_contract! {
-///         i_contract(contract) => method(integer, boolean, binary, string, payment)
+///         i_contract(contract)::method(integer, boolean, binary, string)
 ///     };
 /// }
 /// ```
 #[macro_export]
 macro_rules! call_contract {
-    ($interface:ident ( $contract_id:expr ) => $func_name:ident ( $($args:expr),* )) => {
-        error_handling!($interface::$func_name($contract_id, $($args),* ));
+    ($interface:ident ( $contract_id:expr ) :: $func_name:ident ( $($func_args:expr),* ) $(:: payments ( $($payment_args:expr),+ ))?) => {
+        $(
+            $(
+                error_handling!(call_payment($payment_args.0, $payment_args.1));
+            )+
+        )?
+        error_handling!($interface::$func_name($contract_id, $($func_args),* ));
     };
 }
 
@@ -137,25 +142,25 @@ macro_rules! call_contract {
 #[macro_export]
 macro_rules! get_storage {
     (integer $key:expr) => {
-        error_handling_tuple!(get_storage_int(&[], $key))
+        error_handling_tuple!(get_storage_int(THIS, $key))
     };
     ($address:expr => integer $key:expr) => {
         error_handling_tuple!(get_storage_int($address, $key))
     };
     (boolean $key:expr) => {
-        error_handling_tuple!(get_storage_bool(&[], $key))
+        error_handling_tuple!(get_storage_bool(THIS, $key))
     };
     ($address:expr => boolean $key:expr) => {
         error_handling_tuple!(get_storage_bool($address, $key))
     };
     (binary $key:expr) => {
-        error_handling_tuple!(get_storage_binary(&[], $key))
+        error_handling_tuple!(get_storage_binary(THIS, $key))
     };
     ($address:expr => binary $key:expr) => {
         error_handling_tuple!(get_storage_binary($address, $key))
     };
     (string $key:expr) => {
-        error_handling_tuple!(get_storage_string(&[], $key))
+        error_handling_tuple!(get_storage_string(THIS, $key))
     };
     ($address:expr => string $key:expr) => {
         error_handling_tuple!(get_storage_string($address, $key))
@@ -215,13 +220,13 @@ macro_rules! set_storage {
 #[macro_export]
 macro_rules! get_balance {
     (this) => {
-        error_handling_tuple!(get_balance(&[], &[]))
+        error_handling_tuple!(get_balance(SYSTEM_TOKEN, THIS))
     };
     (this, asset => $asset_id:expr) => {
-        error_handling_tuple!(get_balance($asset_id, &[]))
+        error_handling_tuple!(get_balance($asset_id, THIS))
     };
     (address => $address:expr) => {
-        error_handling_tuple!(get_balance(&[], $address))
+        error_handling_tuple!(get_balance(SYSTEM_TOKEN, $address))
     };
     (address => $address:expr, asset => $asset_id:expr) => {
         error_handling_tuple!(get_balance($asset_id, $address))
@@ -246,7 +251,7 @@ macro_rules! get_balance {
 #[macro_export]
 macro_rules! transfer {
     ($recipient:expr, $amount:expr) => {
-        error_handling!(transfer(&[], $recipient, $amount))
+        error_handling!(transfer(SYSTEM_TOKEN, $recipient, $amount))
     };
     ($asset_id:expr, $recipient:expr, $amount:expr) => {
         error_handling!(transfer($asset_id, $recipient, $amount))

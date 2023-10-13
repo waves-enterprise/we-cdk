@@ -5,13 +5,8 @@ use we_contract_sdk::*;
 // are also available for use within the contract.
 #[interface]
 trait i_contract {
-    fn function(
-        integer: Integer,
-        boolean: Boolean,
-        binary: Binary,
-        string: String,
-        payment: Payment,
-    );
+    fn data_fn(integer: Integer, boolean: Boolean, binary: Binary, string: String);
+    fn payment_fn();
 }
 
 // Declaring a function available for calling.
@@ -32,12 +27,18 @@ fn _constructor() {
     let boolean: Boolean = true;
     let binary: Binary = &[0, 1];
     let string: String = "test";
-    let payment: Payment = (asset, 2400000000);
 
     // Calling a contract.
     // In this case, the `i_contract` interface and the address of the contract to be called are used.
     // And accordingly the function that needs to be called.
     call_contract! {
-        i_contract(contract) => function(integer, boolean, binary, string, payment)
+        i_contract(contract)::data_fn(integer, boolean, binary, string)
     };
+
+    let payment_system_token: Payment = (SYSTEM_TOKEN, 4200000000);
+    let payment: Payment = (asset, 2400000000);
+
+    call_contract! {
+        i_contract(contract)::payment_fn()::payments(payment_system_token, payment)
+    }
 }
