@@ -14,6 +14,12 @@ cargo install cargo-we --force
 
 Use the `--force` to ensure you are updated to the most recent `cargo-we` version.
 
+And there is also an option to install the CLI tool from this project folder.
+
+```
+cargo install --path ./crates/cargo-we/ --force
+```
+
 In order to initialize a new project you can use:
 
 ```
