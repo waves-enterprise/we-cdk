@@ -102,7 +102,6 @@ macro_rules! to_base58_string {
 ///     let boolean: Boolean = true;
 ///     let binary: Binary = &[0, 1];
 ///     let string: String = "test";
-///     let payment: Payment = (asset, 2400000000);
 ///
 ///     call_contract! {
 ///         i_contract(contract)::method(integer, boolean, binary, string)
@@ -131,10 +130,10 @@ macro_rules! call_contract {
 /// fn _constructor() {
 ///     let address = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
 ///
-///     let integer_value: i64 = get_storage!(integer "integer_key");
-///     let boolean_value: bool = get_storage!(boolean "boolean_key");
-///     let binary_value: &[u8] = get_storage!(binary "binary_key");
-///     let string_value: &str = get_storage!(string "string_key");
+///     let integer_value: Integer = get_storage!(integer "integer_key");
+///     let boolean_value: Boolean = get_storage!(boolean "boolean_key");
+///     let binary_value: Binary = get_storage!(binary "binary_key");
+///     let string_value: String = get_storage!(string "string_key");
 ///
 ///     let address_int_value = get_storage!(address => integer "integer_key");
 /// }
@@ -475,16 +474,16 @@ macro_rules! get_tx_payments {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let payment_asset = get_tx_payment!(asset_id => 1);
-///     let payment_amount = get_tx_payment!(amount => 1);
+///     let payment: Payment = get_tx_payment!(0);
+///     let asset_id = payment.0;
+///     let amount = payment.1;
 /// }
 /// ```
 #[macro_export]
 macro_rules! get_tx_payment {
-    (asset_id => $number:expr) => {
-        error_handling_tuple!(get_tx_payment_asset_id($number))
-    };
-    (amount => $number:expr) => {
-        error_handling_tuple!(get_tx_payment_amount($number))
-    };
+    ($number:expr) => {{
+        let asset_id = error_handling_tuple!(get_tx_payment_asset_id($number));
+        let amount = error_handling_tuple!(get_tx_payment_amount($number));
+        (asset_id, amount)
+    }};
 }
