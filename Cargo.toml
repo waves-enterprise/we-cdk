@@ -1,9 +1,8 @@
 [workspace]
 resolver = "2"
-members = [
-    "crates/cargo-we",
-    "crates/codegen",
-    "crates/proc-macro",
-    "crates/sdk",
-    "examples/*"
-]
+members = [ "crates/*" ]
+exclude = [ "examples" ]
+
+[profile.release]
+lto = true
+opt-level = 'z'

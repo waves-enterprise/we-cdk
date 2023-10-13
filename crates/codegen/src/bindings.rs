@@ -51,7 +51,10 @@ extern "C" {
 
     // Lease
     #[no_mangle]
-    pub fn lease<'a>(recipient: &'a [u8], amount: i64) -> (i32, &'a [u8]);
+    pub fn lease_address<'a>(address: &'a [u8], amount: i64) -> (i32, &'a [u8]);
+
+    #[no_mangle]
+    pub fn lease_alias<'a>(alias: &'a str, amount: i64) -> (i32, &'a [u8]);
 
     #[no_mangle]
     pub fn cancel_lease(lease_id: &[u8]) -> i32;
@@ -98,4 +101,7 @@ extern "C" {
     // Utils
     #[no_mangle]
     pub fn base_58<'a>(value: &'a str) -> (i32, &'a [u8]);
+
+    #[no_mangle]
+    pub fn to_base_58_string<'a>(value: &'a [u8]) -> (i32, &'a [u8]);
 }
