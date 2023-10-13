@@ -18,5 +18,3 @@ strip = true
 
 [dependencies]
 we-contract-sdk = { version = "0.1.0", path = "../../crates/sdk" }
-
-            

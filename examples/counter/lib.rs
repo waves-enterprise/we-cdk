@@ -17,6 +17,4 @@ fn restore_counter(new_count: Integer) {
     let owner: Binary = get_storage!(binary "owner");
     require!(owner == get_tx_sender!());
     set_storage!(integer => ("count", new_count));
-} 
-
-            
+}
