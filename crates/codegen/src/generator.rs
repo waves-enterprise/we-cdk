@@ -1,6 +1,8 @@
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
+/// Convert the described interface into a
+/// WASM method set for calling contract methods.
 pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
     let mut mod_func: Vec<TokenStream2> = vec![];
 
@@ -95,6 +97,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
     ))
 }
 
+/// Converting contract methods to valid WASM methods.
 pub fn action(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
     let input = syn::parse2::<syn::ItemFn>(input)?;
 

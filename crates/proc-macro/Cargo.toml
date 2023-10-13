@@ -14,9 +14,5 @@ repository = ""
 [lib]
 proc-macro = true
 
-[profile.release]
-lto = true
-opt-level = 'z'
-
 [dependencies]
 we-contract-codegen = { version = "0.1.0", path = "../codegen" }

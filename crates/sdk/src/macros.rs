@@ -40,7 +40,7 @@ macro_rules! require {
     };
 }
 
-/// Base58 conversion
+/// Base58 string to bytes conversion
 ///
 /// # Result
 /// The result of execution is `&[u8]` bytes
@@ -58,6 +58,28 @@ macro_rules! require {
 macro_rules! base58 {
     ($value:expr) => {
         error_handling_tuple!(base_58($value))
+    };
+}
+
+/// Bytes to Base58 string conversion
+///
+/// # Result
+/// The result of execution is `&[u8]` bytes
+///
+/// # Usage
+/// ```
+/// use we_contract_sdk::*;
+///
+/// #[action]
+/// fn _constructor() {
+///     let address = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
+///     let address_string = to_base58_string!(address);
+/// }
+/// ```
+#[macro_export]
+macro_rules! to_base58_string {
+    ($value:expr) => {
+        error_handling_tuple!(to_base_58_string($value))
     };
 }
 
@@ -317,13 +339,17 @@ macro_rules! reissue {
 /// fn _constructor() {
 ///     let recipient = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
 ///     let amount = 100;
-///     let lease_id = lease!(recipient, amount);
+///     let lease_id_first = lease!(address => recipient, amount);
+///     let lease_id_second = lease!(alias => "miner", amount);
 /// }
 /// ```
 #[macro_export]
 macro_rules! lease {
-    ($recipient:expr, $amount:expr) => {
-        error_handling_tuple!(lease($recipient, $amount));
+    (address => $recipient:expr, $amount:expr) => {
+        error_handling_tuple!(lease_address($recipient, $amount));
+    };
+    (alias => $recipient:expr, $amount:expr) => {
+        error_handling_tuple!(lease_alias($recipient, $amount));
     };
 }
 
