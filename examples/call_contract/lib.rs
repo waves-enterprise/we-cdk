@@ -1,3 +1,5 @@
+#![no_std]
+#![no_main]
 use we_contract_sdk::*;
 
 // Declaring an interface to interact with another contract.

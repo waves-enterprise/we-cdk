@@ -89,7 +89,9 @@ we-contract-sdk = {{ version = "0.1.0", path = "../crates/sdk" }}
 
             write!(
                 lib_rs,
-                r#"use we_contract_sdk::*;
+                r#"#![no_std]
+#![no_main]
+use we_contract_sdk::*;
 
 #[action]
 fn _constructor(init_value: Boolean) {{
