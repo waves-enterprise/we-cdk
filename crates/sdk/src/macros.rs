@@ -1,4 +1,14 @@
 #[macro_export]
+macro_rules! internal_data {
+    (this) => {{
+        (core::ptr::null(), 0)
+    }};
+    (system_token) => {{
+        (core::ptr::null(), 0)
+    }};
+}
+
+#[macro_export]
 macro_rules! error {
     ($error:expr) => {
         if $error != 0 {
@@ -139,7 +149,8 @@ macro_rules! call_contract {
 #[macro_export]
 macro_rules! get_storage {
     (integer $key:expr) => {{
-        let (error, value) = get_storage_int(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        let this = internal_data!(this);
+        let (error, value) = get_storage_int(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         value
     }};
@@ -150,7 +161,8 @@ macro_rules! get_storage {
         value
     }};
     (boolean $key:expr) => {{
-        let (error, value) = get_storage_bool(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        let this = internal_data!(this);
+        let (error, value) = get_storage_bool(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         value
     }};
@@ -161,7 +173,8 @@ macro_rules! get_storage {
         value
     }};
     (binary $key:expr) => {{
-        let (error, ptr, len) = get_storage_binary(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        let this = internal_data!(this);
+        let (error, ptr, len) = get_storage_binary(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};
@@ -172,7 +185,8 @@ macro_rules! get_storage {
         core::slice::from_raw_parts(ptr, len)
     }};
     (string $key:expr) => {{
-        let (error, ptr, len) = get_storage_string(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        let this = internal_data!(this);
+        let (error, ptr, len) = get_storage_string(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         let bytes = core::slice::from_raw_parts(ptr, len);
         core::str::from_utf8_unchecked(bytes)
@@ -243,19 +257,23 @@ macro_rules! set_storage {
 #[macro_export]
 macro_rules! get_balance {
     (this) => {{
-        let (error, balance) = get_balance(SYSTEM_TOKEN.0, SYSTEM_TOKEN.1, THIS.0, THIS.1);
+        let system_token = internal_data!(system_token);
+        let this = internal_data!(this);
+        let (error, balance) = get_balance(system_token.0, system_token.1, this.0, this.1);
         error!(error);
         balance
     }};
     (this, asset => $asset_id:expr) => {{
-        let (error, balance) = get_balance($asset_id.as_ptr(), $asset_id.len(), THIS.0, THIS.1);
+        let this = internal_data!(this);
+        let (error, balance) = get_balance($asset_id.as_ptr(), $asset_id.len(), this.0, this.1);
         error!(error);
         balance
     }};
     (address => $address:expr) => {{
+        let system_token = internal_data!(system_token);
         let (error, balance) = get_balance(
-            SYSTEM_TOKEN.0,
-            SYSTEM_TOKEN.1,
+            system_token.0,
+            system_token.1,
             $address.as_ptr(),
             $address.len(),
         );
@@ -292,9 +310,10 @@ macro_rules! get_balance {
 #[macro_export]
 macro_rules! transfer {
     ($recipient:expr, $amount:expr) => {
+        let system_token = internal_data!(system_token);
         let error = transfer(
-            SYSTEM_TOKEN.0,
-            SYSTEM_TOKEN.1,
+            system_token.0,
+            system_token.1,
             $recipient.as_ptr(),
             $recipient.len(),
             $amount,
