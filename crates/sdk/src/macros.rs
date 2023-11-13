@@ -1,25 +1,17 @@
 #[macro_export]
-macro_rules! error_handling {
-    ($func:expr) => {
-        let result = $func;
-        if result != 0 {
-            return result;
+macro_rules! error {
+    ($error:expr) => {
+        if $error != 0 {
+            return $error;
         }
     };
 }
 
-#[macro_export]
-macro_rules! error_handling_tuple {
-    ($func:expr) => {{
-        let result = $func;
-        if result.0 != 0 {
-            return result.0;
-        }
-        result.1
-    }};
-}
-
 /// Verify inputs and conditions
+///
+/// # Result
+/// If the condition was not satisfied,
+/// the execution will be stopped with error code 300 (RuntimeError::Exception)
 ///
 /// # Usage
 /// ```
@@ -35,7 +27,7 @@ macro_rules! error_handling_tuple {
 macro_rules! require {
     ($condition:expr) => {
         if !($condition) {
-            return -1;
+            return 300;
         }
     };
 }
@@ -56,9 +48,11 @@ macro_rules! require {
 /// ```
 #[macro_export]
 macro_rules! base58 {
-    ($value:expr) => {
-        error_handling_tuple!(base_58($value))
-    };
+    ($value:expr) => {{
+        let (error, ptr, len) = base_58($value.as_ptr(), $value.len());
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
 }
 
 /// Bytes to Base58 string conversion
@@ -78,9 +72,11 @@ macro_rules! base58 {
 /// ```
 #[macro_export]
 macro_rules! to_base58_string {
-    ($value:expr) => {
-        error_handling_tuple!(to_base_58_string($value))
-    };
+    ($value:expr) => {{
+        let (error, ptr, len) = to_base_58_string($value.as_ptr(), $value.len());
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
 }
 
 /// Call contract
@@ -113,10 +109,12 @@ macro_rules! call_contract {
     ($interface:ident ( $contract_id:expr ) :: $func_name:ident ( $($func_args:expr),* ) $(:: payments ( $($payment_args:expr),+ ))?) => {
         $(
             $(
-                error_handling!(call_payment($payment_args.0, $payment_args.1));
+                let error = call_payment($payment_args.0.as_ptr(), $payment_args.0.len(), $payment_args.1);
+                error!(error);
             )+
         )?
-        error_handling!($interface::$func_name($contract_id, $($func_args),* ));
+        let error = $interface::$func_name($contract_id, $($func_args),* );
+        error!(error);
     };
 }
 
@@ -140,30 +138,52 @@ macro_rules! call_contract {
 /// ```
 #[macro_export]
 macro_rules! get_storage {
-    (integer $key:expr) => {
-        error_handling_tuple!(get_storage_int(THIS, $key))
-    };
-    ($address:expr => integer $key:expr) => {
-        error_handling_tuple!(get_storage_int($address, $key))
-    };
-    (boolean $key:expr) => {
-        error_handling_tuple!(get_storage_bool(THIS, $key))
-    };
-    ($address:expr => boolean $key:expr) => {
-        error_handling_tuple!(get_storage_bool($address, $key))
-    };
-    (binary $key:expr) => {
-        error_handling_tuple!(get_storage_binary(THIS, $key))
-    };
-    ($address:expr => binary $key:expr) => {
-        error_handling_tuple!(get_storage_binary($address, $key))
-    };
-    (string $key:expr) => {
-        error_handling_tuple!(get_storage_string(THIS, $key))
-    };
-    ($address:expr => string $key:expr) => {
-        error_handling_tuple!(get_storage_string($address, $key))
-    };
+    (integer $key:expr) => {{
+        let (error, value) = get_storage_int(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        error!(error);
+        value
+    }};
+    ($address:expr => integer $key:expr) => {{
+        let (error, value) =
+            get_storage_int($address.as_ptr(), $address.len(), $key.as_ptr(), $key.len());
+        error!(error);
+        value
+    }};
+    (boolean $key:expr) => {{
+        let (error, value) = get_storage_bool(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        error!(error);
+        value
+    }};
+    ($address:expr => boolean $key:expr) => {{
+        let (error, value) =
+            get_storage_bool($address.as_ptr(), $address.len(), $key.as_ptr(), $key.len());
+        error!(error);
+        value
+    }};
+    (binary $key:expr) => {{
+        let (error, ptr, len) = get_storage_binary(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
+    ($address:expr => binary $key:expr) => {{
+        let (error, ptr, len) =
+            get_storage_binary($address.as_ptr(), $address.len(), $key.as_ptr(), $key.len());
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
+    (string $key:expr) => {{
+        let (error, ptr, len) = get_storage_string(THIS.0, THIS.1, $key.as_ptr(), $key.len());
+        error!(error);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        core::str::from_utf8_unchecked(bytes)
+    }};
+    ($address:expr => string $key:expr) => {{
+        let (error, ptr, len) =
+            get_storage_string($address.as_ptr(), $address.len(), $key.as_ptr(), $key.len());
+        error!(error);
+        let bytes = core::slice::from_raw_parts(ptr, len);
+        core::str::from_utf8_unchecked(bytes)
+    }};
 }
 
 /// Set storage
@@ -182,17 +202,21 @@ macro_rules! get_storage {
 /// ```
 #[macro_export]
 macro_rules! set_storage {
-    (integer => ( $key:expr, $value:expr )) => {
-        error_handling!(set_storage_int($key, $value));
-    };
+    (integer => ( $key:expr, $value:expr )) => {{
+        let error = set_storage_int($key.as_ptr(), $key.len(), $value);
+        error!(error);
+    }};
     (boolean => ( $key:expr, $value:expr )) => {
-        error_handling!(set_storage_bool($key, $value));
+        let error = set_storage_bool($key.as_ptr(), $key.len(), $value);
+        error!(error);
     };
     (binary => ( $key:expr, $value:expr )) => {
-        error_handling!(set_storage_binary($key, $value));
+        let error = set_storage_binary($key.as_ptr(), $key.len(), $value.as_ptr(), $value.len());
+        error!(error);
     };
     (string => ( $key:expr, $value:expr )) => {
-        error_handling!(set_storage_string($key, $value));
+        let error = set_storage_string($key.as_ptr(), $key.len(), $value.as_ptr(), $value.len());
+        error!(error);
     };
 }
 
@@ -218,18 +242,36 @@ macro_rules! set_storage {
 /// ```
 #[macro_export]
 macro_rules! get_balance {
-    (this) => {
-        error_handling_tuple!(get_balance(SYSTEM_TOKEN, THIS))
-    };
-    (this, asset => $asset_id:expr) => {
-        error_handling_tuple!(get_balance($asset_id, THIS))
-    };
-    (address => $address:expr) => {
-        error_handling_tuple!(get_balance(SYSTEM_TOKEN, $address))
-    };
-    (address => $address:expr, asset => $asset_id:expr) => {
-        error_handling_tuple!(get_balance($asset_id, $address))
-    };
+    (this) => {{
+        let (error, balance) = get_balance(SYSTEM_TOKEN.0, SYSTEM_TOKEN.1, THIS.0, THIS.1);
+        error!(error);
+        balance
+    }};
+    (this, asset => $asset_id:expr) => {{
+        let (error, balance) = get_balance($asset_id.as_ptr(), $asset_id.len(), THIS.0, THIS.1);
+        error!(error);
+        balance
+    }};
+    (address => $address:expr) => {{
+        let (error, balance) = get_balance(
+            SYSTEM_TOKEN.0,
+            SYSTEM_TOKEN.1,
+            $address.as_ptr(),
+            $address.len(),
+        );
+        error!(error);
+        balance
+    }};
+    (address => $address:expr, asset => $asset_id:expr) => {{
+        let (error, balance) = get_balance(
+            $asset_id.as_ptr(),
+            $asset_id.len(),
+            $address.as_ptr(),
+            $address.len(),
+        );
+        error!(error);
+        balance
+    }};
 }
 
 /// Tokens transfer
@@ -250,10 +292,24 @@ macro_rules! get_balance {
 #[macro_export]
 macro_rules! transfer {
     ($recipient:expr, $amount:expr) => {
-        error_handling!(transfer(SYSTEM_TOKEN, $recipient, $amount))
+        let error = transfer(
+            SYSTEM_TOKEN.0,
+            SYSTEM_TOKEN.1,
+            $recipient.as_ptr(),
+            $recipient.len(),
+            $amount,
+        );
+        error!(error);
     };
     ($asset_id:expr, $recipient:expr, $amount:expr) => {
-        error_handling!(transfer($asset_id, $recipient, $amount))
+        let error = transfer(
+            $asset_id.as_ptr(),
+            $asset_id.len(),
+            $recipient.as_ptr(),
+            $recipient.len(),
+            $amount,
+        );
+        error!(error);
     };
 }
 
@@ -278,15 +334,19 @@ macro_rules! transfer {
 /// ```
 #[macro_export]
 macro_rules! issue {
-    ($name:expr, $description:expr, $quantity:expr, $decimals:expr, $is_reissuable:expr) => {
-        error_handling_tuple!(issue(
-            $name,
-            $description,
+    ($name:expr, $description:expr, $quantity:expr, $decimals:expr, $is_reissuable:expr) => {{
+        let (error, ptr, len) = issue(
+            $name.as_ptr(),
+            $name.len(),
+            $description.as_ptr(),
+            $description.len(),
             $quantity,
             $decimals,
-            $is_reissuable
-        ))
-    };
+            $is_reissuable,
+        );
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
 }
 
 /// Burn the asset
@@ -305,7 +365,8 @@ macro_rules! issue {
 #[macro_export]
 macro_rules! burn {
     ($asset_id:expr, $amount:expr) => {
-        error_handling!(burn($asset_id, $amount))
+        let error = burn($asset_id.as_ptr(), $asset_id.len(), $amount);
+        error!(error);
     };
 }
 
@@ -326,7 +387,8 @@ macro_rules! burn {
 #[macro_export]
 macro_rules! reissue {
     ($asset_id:expr, $amount:expr, $is_reissuable:expr) => {
-        error_handling!(reissue($asset_id, $amount, $is_reissuable))
+        let error = reissue($asset_id.as_ptr(), $asset_id.len(), $amount, $is_reissuable);
+        error!(error);
     };
 }
 
@@ -349,12 +411,16 @@ macro_rules! reissue {
 /// ```
 #[macro_export]
 macro_rules! lease {
-    (address => $recipient:expr, $amount:expr) => {
-        error_handling_tuple!(lease_address($recipient, $amount));
-    };
-    (alias => $recipient:expr, $amount:expr) => {
-        error_handling_tuple!(lease_alias($recipient, $amount));
-    };
+    (address => $recipient:expr, $amount:expr) => {{
+        let (error, ptr, len) = lease_address($recipient.as_ptr(), $recipient.len(), $amount);
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
+    (alias => $recipient:expr, $amount:expr) => {{
+        let (error, ptr, len) = lease_alias($recipient.as_ptr(), $recipient.len(), $amount);
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
 }
 
 /// Cancel the lease
@@ -372,7 +438,8 @@ macro_rules! lease {
 #[macro_export]
 macro_rules! cancel_lease {
     ($lease_id:expr) => {
-        error_handling!(cancel_lease($lease_id))
+        let error = cancel_lease($lease_id.as_ptr(), $lease_id.len());
+        error!(error);
     };
 }
 
@@ -392,9 +459,11 @@ macro_rules! cancel_lease {
 /// ```
 #[macro_export]
 macro_rules! get_block_timestamp {
-    () => {
-        error_handling_tuple!(get_block_timestamp())
-    };
+    () => {{
+        let (error, value) = get_block_timestamp();
+        error!(error);
+        value
+    }};
 }
 
 /// Get block height
@@ -413,9 +482,11 @@ macro_rules! get_block_timestamp {
 /// ```
 #[macro_export]
 macro_rules! get_block_height {
-    () => {
-        error_handling_tuple!(get_block_height())
-    };
+    () => {{
+        let (error, value) = get_block_height();
+        error!(error);
+        value
+    }};
 }
 
 /// Get the address of the calling contract
@@ -434,9 +505,11 @@ macro_rules! get_block_height {
 /// ```
 #[macro_export]
 macro_rules! get_tx_sender {
-    () => {
-        error_handling_tuple!(get_tx_sender())
-    };
+    () => {{
+        let (error, ptr, len) = get_tx_sender();
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
 }
 
 /// Get the number of attached payments in the transaction
@@ -455,9 +528,11 @@ macro_rules! get_tx_sender {
 /// ```
 #[macro_export]
 macro_rules! get_tx_payments {
-    () => {
-        error_handling_tuple!(get_tx_payments())
-    };
+    () => {{
+        let (error, value) = get_tx_payments();
+        error!(error);
+        value
+    }};
 }
 
 /// Get the `asset_id` or `amount` of the attached payment in the transaction
@@ -482,8 +557,17 @@ macro_rules! get_tx_payments {
 #[macro_export]
 macro_rules! get_tx_payment {
     ($number:expr) => {{
-        let asset_id = error_handling_tuple!(get_tx_payment_asset_id($number));
-        let amount = error_handling_tuple!(get_tx_payment_amount($number));
+        let asset_id = {
+            let (error, ptr, len) = get_tx_payment_asset_id($number);
+            error!(error);
+            core::slice::from_raw_parts(ptr, len)
+        };
+
+        let amount = {
+            let (error, value) = get_tx_payment_amount($number);
+            error!(error);
+            value
+        };
         (asset_id, amount)
     }};
 }
