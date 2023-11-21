@@ -53,14 +53,14 @@ use we_contract_sdk::*;
 #[action]
 fn _constructor(init_value: Boolean) {
     // Write the obtained value as an argument of the function into contract state.
-    set_storage!(boolean => ("value", init_value));
+    set_storage!(boolean :: "value" => init_value);
 }
 
 #[action]
 fn flip() {
     // Read the value from the contract state.
-    let value: Boolean = get_storage!(boolean "value");
+    let value: Boolean = get_storage!(boolean :: "value");
     // Write the inverted value to the contract state.
-    set_storage!(boolean => ("value", !value));
+    set_storage!(boolean :: "value" => !value);
 }
 ```
