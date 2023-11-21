@@ -170,7 +170,7 @@ extern "C" {
     ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn bytes_equals(
+    pub fn binary_equals(
         offset_left: *const u8,
         length_left: usize,
         offset_right: *const u8,
@@ -186,7 +186,7 @@ extern "C" {
     ) -> (i32, bool);
 
     #[no_mangle]
-    pub fn concat(
+    pub fn join(
         offset_left: *const u8,
         length_left: usize,
         offset_right: *const u8,
