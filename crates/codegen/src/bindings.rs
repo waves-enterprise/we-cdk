@@ -3,25 +3,43 @@
 extern "C" {
     // Asset
     #[no_mangle]
-    pub fn get_balance(asset_id: &[u8], address: &[u8]) -> (i32, i64);
+    pub fn get_balance(
+        offset_asset_id: *const u8,
+        length_asset_id: usize,
+        offset_address: *const u8,
+        length_address: usize,
+    ) -> (i32, i64);
 
     #[no_mangle]
-    pub fn transfer(asset_id: &[u8], recipient: &[u8], amount: i64) -> i32;
+    pub fn transfer(
+        offset_asset_id: *const u8,
+        length_asset_id: usize,
+        offset_recipient: *const u8,
+        length_recipient: usize,
+        amount: i64,
+    ) -> i32;
 
     #[no_mangle]
-    pub fn issue<'a>(
-        name: &'a str,
-        description: &'a str,
+    pub fn issue(
+        offset_name: *const u8,
+        length_name: usize,
+        offset_description: *const u8,
+        length_description: usize,
         quantity: i64,
         decimals: i32,
         is_reissuable: bool,
-    ) -> (i32, &'a [u8]);
+    ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn burn(asset_id: &[u8], amount: i64) -> i32;
+    pub fn burn(offset_asset_id: *const u8, length_asset_id: usize, amount: i64) -> i32;
 
     #[no_mangle]
-    pub fn reissue(asset_id: &[u8], amount: i64, is_reissuable: bool) -> i32;
+    pub fn reissue(
+        offset_asset_id: *const u8,
+        length_asset_id: usize,
+        amount: i64,
+        is_reissuable: bool,
+    ) -> i32;
 
     // Block
     #[no_mangle]
@@ -38,70 +56,140 @@ extern "C" {
     pub fn call_arg_bool(value: bool);
 
     #[no_mangle]
-    pub fn call_arg_binary(value: &[u8]) -> i32;
+    pub fn call_arg_binary(offset_value: *const u8, length_value: usize) -> i32;
 
     #[no_mangle]
-    pub fn call_arg_string(value: &str) -> i32;
+    pub fn call_arg_string(offset_value: *const u8, length_value: usize) -> i32;
 
     #[no_mangle]
-    pub fn call_payment(asset_id: &[u8], amount: i64) -> i32;
+    pub fn call_payment(offset_asset_id: *const u8, length_asset_id: usize, amount: i64) -> i32;
 
     #[no_mangle]
-    pub fn call_contract(contract_id: &[u8], func_name: &str) -> i32;
+    pub fn call_contract(
+        offset_contract_id: *const u8,
+        length_contract_id: usize,
+        offset_func_name: *const u8,
+        length_func_name: usize,
+    ) -> i32;
 
     // Lease
     #[no_mangle]
-    pub fn lease_address<'a>(address: &'a [u8], amount: i64) -> (i32, &'a [u8]);
+    pub fn lease_address(
+        offset_address: *const u8,
+        length_address: usize,
+        amount: i64,
+    ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn lease_alias<'a>(alias: &'a str, amount: i64) -> (i32, &'a [u8]);
+    pub fn lease_alias(
+        offset_alias: *const u8,
+        length_alias: usize,
+        amount: i64,
+    ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn cancel_lease(lease_id: &[u8]) -> i32;
+    pub fn cancel_lease(offset_lease_id: *const u8, length_lease_id: usize) -> i32;
 
     // Payments
     #[no_mangle]
     pub fn get_tx_payments() -> (i32, i32);
 
     #[no_mangle]
-    pub fn get_tx_payment_asset_id<'a>(number: i32) -> (i32, &'a [u8]);
+    pub fn get_tx_payment_asset_id(number: i32) -> (i32, *const u8, usize);
 
     #[no_mangle]
     pub fn get_tx_payment_amount(number: i32) -> (i32, i64);
 
     // Storage
     #[no_mangle]
-    pub fn get_storage_int(address: &[u8], key: &str) -> (i32, i64);
+    pub fn get_storage_int(
+        offset_address: *const u8,
+        length_address: usize,
+        offset_key: *const u8,
+        length_key: usize,
+    ) -> (i32, i64);
 
     #[no_mangle]
-    pub fn get_storage_bool(address: &[u8], key: &str) -> (i32, bool);
+    pub fn get_storage_bool(
+        offset_address: *const u8,
+        length_address: usize,
+        offset_key: *const u8,
+        length_key: usize,
+    ) -> (i32, bool);
 
     #[no_mangle]
-    pub fn get_storage_binary<'a>(address: &'a [u8], key: &'a str) -> (i32, &'a [u8]);
+    pub fn get_storage_binary(
+        offset_address: *const u8,
+        length_address: usize,
+        offset_key: *const u8,
+        length_key: usize,
+    ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn get_storage_string<'a>(address: &'a [u8], key: &'a str) -> (i32, &'a str);
+    pub fn get_storage_string(
+        offset_address: *const u8,
+        length_address: usize,
+        offset_key: *const u8,
+        length_key: usize,
+    ) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn set_storage_int(key: &str, value: i64) -> i32;
+    pub fn set_storage_int(offset_key: *const u8, length_key: usize, value: i64) -> i32;
 
     #[no_mangle]
-    pub fn set_storage_bool(key: &str, value: bool) -> i32;
+    pub fn set_storage_bool(offset_key: *const u8, length_key: usize, value: bool) -> i32;
 
     #[no_mangle]
-    pub fn set_storage_binary(key: &str, value: &[u8]) -> i32;
+    pub fn set_storage_binary(
+        offset_key: *const u8,
+        length_key: usize,
+        offset_value: *const u8,
+        length_value: usize,
+    ) -> i32;
 
     #[no_mangle]
-    pub fn set_storage_string(key: &str, value: &str) -> i32;
+    pub fn set_storage_string(
+        offset_key: *const u8,
+        length_key: usize,
+        offset_value: *const u8,
+        length_value: usize,
+    ) -> i32;
 
     // Tx
     #[no_mangle]
-    pub fn get_tx_sender<'a>() -> (i32, &'a [u8]);
+    pub fn get_tx_sender() -> (i32, *const u8, usize);
 
     // Utils
     #[no_mangle]
-    pub fn base_58<'a>(value: &'a str) -> (i32, &'a [u8]);
+    pub fn base_58(offset_bytes: *const u8, length_bytes: usize) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn to_base_58_string<'a>(value: &'a [u8]) -> (i32, &'a [u8]);
+    pub fn to_base_58_string(
+        offset_bytes: *const u8,
+        length_bytes: usize,
+    ) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn binary_equals(
+        offset_left: *const u8,
+        length_left: usize,
+        offset_right: *const u8,
+        length_right: usize,
+    ) -> (i32, bool);
+
+    #[no_mangle]
+    pub fn string_equals(
+        offset_left: *const u8,
+        length_left: usize,
+        offset_right: *const u8,
+        length_right: usize,
+    ) -> (i32, bool);
+
+    #[no_mangle]
+    pub fn join(
+        offset_left: *const u8,
+        length_left: usize,
+        offset_right: *const u8,
+        length_right: usize,
+    ) -> (i32, *const u8, usize);
 }

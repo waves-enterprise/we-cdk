@@ -95,13 +95,13 @@ use we_contract_sdk::*;
 
 #[action]
 fn _constructor(init_value: Boolean) {{
-    set_storage!(boolean => ("value", init_value));
+    set_storage!(boolean :: "value" => init_value);
 }}
 
 #[action]
 fn flip() {{
-    let value: Boolean = get_storage!(boolean "value");
-    set_storage!(boolean => ("value", !value));
+    let value: Boolean = get_storage!(boolean :: "value");
+    set_storage!(boolean :: "value" => !value);
 }}
 "#
             )?;

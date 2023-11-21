@@ -49,9 +49,9 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        let result = call_arg_binary(#arg_name);
-                                        if result != 0 {
-                                            return result;
+                                        let error = call_arg_binary(#arg_name.as_ptr(), #arg_name.len());
+                                        if error != 0 {
+                                            return error;
                                         }
                                     ));
                                 }
@@ -61,9 +61,9 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        let result = call_arg_string(#arg_name);
-                                        if result != 0 {
-                                            return result;
+                                        let error = call_arg_string(#arg_name.as_ptr(), #arg_name.len());
+                                        if error != 0 {
+                                            return error;
                                         }
                                     ));
                                 }
@@ -78,7 +78,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                 pub fn #func_name(contract_id: &[u8], #( #args ),*) -> i32 {
                     unsafe {
                         #( #call_args )*
-                        call_contract(contract_id, #func_name_str)
+                        call_contract(contract_id.as_ptr(), contract_id.len(), #func_name_str.as_ptr(), #func_name_str.len())
                     }
                 }
             ));
