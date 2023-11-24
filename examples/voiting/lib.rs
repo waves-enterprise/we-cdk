@@ -1,53 +1,50 @@
-use std::str;
+#![no_std]
+#![no_main]
 use we_contract_sdk::*;
 
 #[action]
 fn _constructor() {
-    set_storage!(binary => ("owner", get_tx_sender!()));
+    let tx_sender = get_tx_sender!();
+    set_storage!(binary :: "owner" => tx_sender);
 }
 
 #[action]
 fn init_vote(address_contract: String, start_vote: Integer, end_vote: Integer) {
-    require!(get_storage!(binary "owner") == get_tx_sender!());
+    let tx_sender = get_tx_sender!();
+    let owner = get_storage!(binary :: "owner");
+    require!(equals!(binary :: owner, tx_sender));
 
-    set_storage!(string => ("address_contract_voting", address_contract));
-    set_storage!(integer => (format!("{}_{}", address_contract, "start_vote"), start_vote));
-    set_storage!(integer => (format!("{}_{}", address_contract, "end_vote"), end_vote));
-    set_storage!(integer => (format!("{}_{}", address_contract, "count_vote"), 0));
+    let key = join!(string :: address_contract, "_start_vote");
+    set_storage!(integer :: key => start_vote);
+
+    let key = join!(string :: address_contract, "_end_vote");
+    set_storage!(integer :: key => end_vote);
+
+    let key = join!(string :: address_contract, "_count_vote");
+    set_storage!(integer :: key => 0);
 }
 
 #[action]
-fn vote(address_contract: String, address_voters: String) {
-    let address_contract_voting = get_storage!(string "address_contract_voting");
-    require!(address_contract_voting == address_contract);
-    require!(base58!(address_voters) == get_tx_sender!());
+fn vote(address_contract: String) {
+    let tx_sender = get_tx_sender!();
+    let string_tx_sender = to_base58_string!(tx_sender);
+
+    let start_vote_key = join!(string :: address_contract, "_start_vote");
+    let end_vote_key = join!(string :: address_contract, "_end_vote");
+    let count_vote_key = join!(string :: address_contract, "_count_vote");
 
     require!(
-        get_block_timestamp!() > get_storage!(integer "start_vote")
-            && get_block_timestamp!() < get_storage!(integer "end_vote")
+        get_block_timestamp!() > get_storage!(integer :: start_vote_key)
+            && get_block_timestamp!() < get_storage!(integer :: end_vote_key)
     );
-    match get_storage!(boolean address_voters) {
+
+    let key = join!(string :: string_tx_sender, "_", address_contract);
+    match get_storage!(boolean :: key) {
         false => {
-            set_storage!(boolean => (address_voters, true));
-            let count = get_storage!(integer "count_vote");
-            set_storage!(integer => ("count_vote", count + 1));
+            set_storage!(boolean :: key => true);
+            let count_vote = get_storage!(integer :: count_vote_key);
+            set_storage!(integer :: count_vote_key => count_vote + 1);
         }
-        _ => {
-            require!(false);
-        }
+        _ => require!(false),
     }
-}
-
-#[action]
-fn result() {
-    require!(get_storage!(binary "owner") == get_tx_sender!());
-    require!(get_block_timestamp!() > get_storage!(integer "end_vote"));
-    let count_vote = get_storage!(integer "count_vote");
-    set_storage!(integer => ("result", count_vote));
-}
-
-//coming soon
-#[action]
-fn info_contract_vote(address_contract: String) {
-    require!(get_storage!(string "address_contract_voting") == address_contract);
 }
