@@ -1,6 +1,6 @@
 #![no_std]
 #![no_main]
-use we_contract_sdk::*;
+use we_cdk::*;
 
 // Declaring a function available for calling.
 // `#[action]` keyword is used for this purpose.

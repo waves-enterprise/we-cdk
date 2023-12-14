@@ -25,7 +25,7 @@ macro_rules! error {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -49,7 +49,7 @@ macro_rules! require {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -72,7 +72,7 @@ macro_rules! base58 {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -94,7 +94,7 @@ macro_rules! to_base58_string {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -126,7 +126,7 @@ macro_rules! join {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -154,7 +154,7 @@ macro_rules! equals {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 /// #[interface]
 /// trait i_contract {
 ///     fn method(integer: Integer, boolean: Boolean, binary: Binary, string: String);
@@ -193,7 +193,7 @@ macro_rules! call_contract {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -265,7 +265,7 @@ macro_rules! get_storage {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -302,7 +302,7 @@ macro_rules! set_storage {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -357,7 +357,7 @@ macro_rules! get_balance {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -400,7 +400,7 @@ macro_rules! transfer {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -433,7 +433,7 @@ macro_rules! issue {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -454,7 +454,7 @@ macro_rules! burn {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -479,7 +479,7 @@ macro_rules! reissue {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -507,7 +507,7 @@ macro_rules! lease {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -530,7 +530,7 @@ macro_rules! cancel_lease {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -553,7 +553,7 @@ macro_rules! get_block_timestamp {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -576,7 +576,7 @@ macro_rules! get_block_height {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -599,7 +599,7 @@ macro_rules! get_tx_sender {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {
@@ -625,7 +625,7 @@ macro_rules! get_tx_payments {
 ///
 /// # Usage
 /// ```
-/// use we_contract_sdk::*;
+/// use we_cdk::*;
 ///
 /// #[action]
 /// fn _constructor() {

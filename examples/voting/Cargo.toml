@@ -1,5 +1,5 @@
 [package]
-name = "voiting"
+name = "voting"
 version = "0.1.0"
 edition = "2021"
 
@@ -17,4 +17,4 @@ panic = 'abort'
 strip = true
 
 [dependencies]
-we-contract-sdk = { version = "0.1.0", path = "../../crates/sdk" }
+we-cdk = { version = "0.1.1", path = "../../crates/cdk" }

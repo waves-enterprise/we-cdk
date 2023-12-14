@@ -1,6 +1,6 @@
 #![no_std]
 #![no_main]
-use we_contract_sdk::*;
+use we_cdk::*;
 
 #[action]
 fn _constructor(

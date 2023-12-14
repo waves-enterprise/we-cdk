@@ -1,4 +1,4 @@
-# we-contract-sdk
+# we-cdk
 
 Toolkit for development WASM smart-contracts on Waves Enterprise ecosystem.
 
@@ -45,7 +45,7 @@ It provides method flip its value from `true` to `false` (and vice versa) and.
 Below you can see the code using SDK.
 
 ```rust
-use we_contract_sdk::*;
+use we_cdk::*;
 
 // Declaring a function available for calling.
 // `#[action]` keyword is used for this purpose.

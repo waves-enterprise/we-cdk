@@ -1,6 +1,6 @@
 #![no_std]
 #![no_main]
-use we_contract_sdk::*;
+use we_cdk::*;
 
 // Declaring an interface to interact with another contract.
 // The types used, for specifying the type of arguments,

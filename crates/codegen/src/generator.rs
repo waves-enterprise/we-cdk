@@ -87,7 +87,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
 
     Ok(quote!(
         mod #mod_name {
-            use we_contract_sdk::*;
+            use we_cdk::*;
 
             #( #mod_func )*
         }

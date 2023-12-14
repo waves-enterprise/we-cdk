@@ -107,7 +107,7 @@ panic = 'abort'
 strip = true
 
 [dependencies]
-we-contract-sdk = {{ version = "0.1.0", path = "../crates/sdk" }}
+we-cdk = "0.1.1"
 "#,
         name
     )?;
@@ -125,7 +125,7 @@ we-contract-sdk = {{ version = "0.1.0", path = "../crates/sdk" }}
         lib_rs,
         r#"#![no_std]
 #![no_main]
-use we_contract_sdk::*;
+use we_cdk::*;
 
 #[action]
 fn _constructor(init_value: Boolean) {{
