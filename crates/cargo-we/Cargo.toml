@@ -6,8 +6,8 @@ authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
 description = "Setup and deployment tool for developing WASM based smart-contracts"
 license = "MIT"
 readme = "README.md"
-homepage = ""
-repository = ""
+homepage = "https://github.com/waves-enterprise/we-cdk"
+repository = "https://github.com/waves-enterprise/we-cdk"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
