@@ -40,9 +40,9 @@ cargo we build
 
 The `Flipper` contract is a simple contract containing only a single `bool` value.
 
-It provides method flip its value from `true` to `false` (and vice versa) and.
+It provides method flip its value from `true` to `false` (and vice versa).
 
-Below you can see the code using SDK.
+Below you can see the code using CDK.
 
 ```rust
 use we_cdk::*;
