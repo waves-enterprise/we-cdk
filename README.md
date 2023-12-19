@@ -45,6 +45,8 @@ It provides method flip its value from `true` to `false` (and vice versa).
 Below you can see the code using CDK.
 
 ```rust
+#![no_std]
+#![no_main]
 use we_cdk::*;
 
 // Declaring a function available for calling.
