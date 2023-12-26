@@ -26,7 +26,7 @@ extern "C" {
         offset_description: *const u8,
         length_description: usize,
         quantity: i64,
-        decimals: i32,
+        decimals: i64,
         is_reissuable: bool,
     ) -> (i32, *const u8, usize);
 
@@ -92,13 +92,13 @@ extern "C" {
 
     // Payments
     #[no_mangle]
-    pub fn get_tx_payments() -> (i32, i32);
+    pub fn get_tx_payments() -> (i32, i64);
 
     #[no_mangle]
-    pub fn get_tx_payment_asset_id(number: i32) -> (i32, *const u8, usize);
+    pub fn get_tx_payment_asset_id(number: i64) -> (i32, *const u8, usize);
 
     #[no_mangle]
-    pub fn get_tx_payment_amount(number: i32) -> (i32, i64);
+    pub fn get_tx_payment_amount(number: i64) -> (i32, i64);
 
     // Storage
     #[no_mangle]
