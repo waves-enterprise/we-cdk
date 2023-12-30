@@ -1,11 +1,16 @@
+mod metadata;
+
 use cargo_metadata::Message;
 use clap::{Args, Parser, Subcommand};
+use metadata::Metadata;
 use std::{
     env, fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
+
+const TARGET_WE: &str = "target/we";
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -194,7 +199,7 @@ fn build() -> Result<(), Error> {
         std::io::BufReader::new(command.stdout.take().expect("Failed to get a read handle"));
 
     for message in cargo_metadata::Message::parse_stream(reader) {
-        match message.expect("Message error") {
+        match message.expect("Unable to get message") {
             Message::CompilerMessage(msg) => {
                 println!("{:?}", msg);
             }
@@ -225,7 +230,6 @@ fn wat2wasm(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
             .to_string(),
         None => filename
             .clone()
-            // .as_os_str()
             .file_name()
             .expect("")
             .to_str()
