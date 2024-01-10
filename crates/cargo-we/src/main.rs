@@ -1,6 +1,6 @@
 mod metadata;
 
-use cargo_metadata::Message;
+use cargo_metadata::{Message, MetadataCommand};
 use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
 use std::{
@@ -75,9 +75,11 @@ fn new(name: String, target_dir: Option<PathBuf>) -> Result<(), Error> {
             <PathBuf as AsRef<Path>>::as_ref(&p).to_path_buf()
         })
         .join(name.clone());
+
     if out_dir.join("Cargo.toml").exists() {
         println!("A Cargo package already exists in {}", name);
     }
+
     if !out_dir.exists() {
         fs::create_dir(&out_dir)?;
     }
@@ -183,11 +185,25 @@ Cargo.lock
 }
 
 fn build() -> Result<(), Error> {
+    let metadata = MetadataCommand::new()
+        .manifest_path("Cargo.toml")
+        .exec()
+        .expect("Unable to runs `cargo metadata`");
+
+    let project_name = metadata
+        .root_package()
+        .expect("Unable to get root package")
+        .name
+        .as_str();
+
+    fs::create_dir_all(TARGET_WE)?;
+
     let mut command = Command::new("cargo")
             .args([
                 "+nightly",
                 "build",
                 "--release",
+                "--message-format=json-render-diagnostics",
                 "-Zbuild-std=std,panic_abort",
                 "--target=wasm32-unknown-unknown",
                 "--config=target.wasm32-unknown-unknown.rustflags = [\"-C\", \"target-feature=+bulk-memory,+multivalue\", \"-C\", \"link-args=--no-entry --import-memory -zstack-size=16 --initial-memory=131072 --max-memory=1048576\"]"
@@ -200,17 +216,28 @@ fn build() -> Result<(), Error> {
 
     for message in cargo_metadata::Message::parse_stream(reader) {
         match message.expect("Unable to get message") {
-            Message::CompilerMessage(msg) => {
-                println!("{:?}", msg);
-            }
             Message::CompilerArtifact(artifact) => {
-                println!("{:?}", artifact);
-            }
-            Message::BuildScriptExecuted(script) => {
-                println!("{:?}", script);
+                if artifact.target.name == project_name && !artifact.filenames.is_empty() {
+                    if let Some(file_name) = artifact.filenames[0].file_name() {
+                        fs::rename(
+                            &artifact.filenames[0],
+                            format!("{}/{}", TARGET_WE, file_name),
+                        )?;
+                    }
+                }
             }
             Message::BuildFinished(finished) => {
-                println!("{:?}", finished);
+                if finished.success {
+                    let json = Metadata::new(project_name).as_json();
+
+                    let mut metadata_file = fs::OpenOptions::new()
+                        .create(true)
+                        .write(true)
+                        .truncate(true)
+                        .open(format!("{}/{}.json", TARGET_WE, project_name))?;
+
+                    write!(metadata_file, "{}", json)?;
+                }
             }
             _ => (),
         }
@@ -244,9 +271,7 @@ fn wat2wasm(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
         .write(true)
         .truncate(true)
         .open(output)?;
-    let _ = file.write_all(&binary);
-
-    Ok(())
+    file.write_all(&binary)
 }
 
 fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
@@ -260,7 +285,7 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
                 .truncate(true)
                 .open(path)?;
 
-            let _ = file.write_all(wat.as_bytes());
+            file.write_all(wat.as_bytes())?;
         }
         None => println!("{}", wat),
     }
