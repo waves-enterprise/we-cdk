@@ -36,7 +36,7 @@ impl Metadata {
     }
 
     pub fn as_json(&self) -> String {
-        serde_json::to_string(self).expect("Unable to ser struct")
+        serde_json::to_string(self).expect("Unable to serialize struct to JSON")
     }
 
     fn parse_ast(ast: syn::File) -> Vec<Func> {
@@ -61,19 +61,12 @@ impl Metadata {
                                     let arg_name = pat_ident.ident.to_string();
 
                                     if let syn::Type::Path(type_path) = &*a.ty {
-                                        match Self::get_ident(&type_path.path) {
-                                            Some(ident) => args.push(Arg {
-                                                name: arg_name,
-                                                ty: ident.to_string(),
-                                            }),
-                                            None => match type_path.path.get_ident() {
-                                                Some(ident) => args.push(Arg {
-                                                    name: arg_name,
-                                                    ty: ident.to_string(),
-                                                }),
-                                                None => println!("ERROR!"), // TODO
-                                            },
-                                        }
+                                        args.push(Arg {
+                                            name: arg_name,
+                                            ty: Self::get_ty(&type_path.path)
+                                                .expect("Unable to get ty")
+                                                .to_string(),
+                                        })
                                     }
                                 }
                             }
@@ -89,6 +82,14 @@ impl Metadata {
         }
 
         result
+    }
+
+    fn get_ty(path: &syn::Path) -> Option<&syn::Ident> {
+        if let Some(ident) = Self::get_ident(path) {
+            Some(ident)
+        } else {
+            path.get_ident()
+        }
     }
 
     fn is_ident(path: &syn::Path, ident: &str) -> bool {
