@@ -36,6 +36,8 @@ In order to build the contract just execute this command in the `flipper` folder
 cargo we build
 ```
 
+As a result you'll get a `target/we/flipper.wasm` file and a `flipper.json` file in the `target/we` folder of your contract.
+
 ## Hello, World! ‒ The Flipper
 
 The `Flipper` contract is a simple contract containing only a single `bool` value.
