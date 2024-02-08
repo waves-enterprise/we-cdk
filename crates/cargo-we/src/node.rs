@@ -1,32 +1,29 @@
-mod transactions;
-
-use serde::{Deserialize, Serialize};
+pub mod transactions;
 
 use reqwest::*;
-use response::*;
+use transactions::*;
 
-pub struct Node<'a> {
-    url: &'a str,
+pub struct Node {
+    url: String,
 }
 
-impl<'a> Node<'a> {
-    pub fn from_url(url: &'a str) -> Self {
+impl Node {
+    pub fn from_url(url: String) -> Self {
         Node { url }
     }
 
     pub async fn transactionSignAndBroadcast(
         &self,
-        api_key: &'a str,
-        tx: TransactionCreateContractWasm,
+        api_key: String,
+        tx: TransactionCreateWasm,
     ) -> Result<(), Error> {
         let url = format!("{}/transactions/signAndBroadcast", self.url);
         let client = reqwest::Client::new();
-        let json_data = serde_json::to_string(&tx)?;
 
         let response = client
             .post(url)
             .header("X-API-Key", api_key)
-            .body(json_data)
+            .body(&tx)
             .send()
             .await?;
         Ok(())

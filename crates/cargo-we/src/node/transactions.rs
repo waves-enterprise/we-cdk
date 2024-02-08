@@ -1,67 +1,49 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-macro_rules! transaction_generator {
-    (struct $name:ident {
-        $(
-            $( #[$attr:meta] )?
-            $field_name:ident: $field_type:ty,
-        )*
-    }) => {
-        #[derive(Debug, Deserialize)]
-        #[serde(rename_all = "camelCase")]
-        pub struct $name {
-            $(
-                $( #[$attr] )?
-                $field_name: $field_type,
-            )*
-        }
-
-        impl $name {
-            $(
-                pub fn $field_name(&self) -> $field_type {
-                    self.$field_name.clone()
-                }
-            )*
-        }
-    }
-}
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct StoredContractWasm {
-    bytecode: String,
-    bytecodeHash: String,
+    pub bytecode: String,
+    pub bytecode_hash: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ParamsTransaction {
-    key: String,
+    pub key: String,
     #[serde(alias = "type")]
-    type_id: String,
-    value: String,
+    pub type_id: String,
+    pub value: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct AtomicBadge {
-    trustedSender: String,
+    pub trustedSender: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct ValidationPolicy {
     #[serde(alias = "type")]
-    type_id: String,
+    pub type_id: String,
 }
 
-transaction_generator! {
-    struct TransactionCreateContractWasm {
-        #[serde(alias = "type")]
-        type_id: u64,
-        version: u64,
-        sender: &'a str,
-        password: &'a str,
-        contractName: &'a str,
-        storedContract: StoredContractWasm,
-        params: Vec<ParamsTransaction>,
-        fee: u64,
-        timestamp: u64,
-        feeAssetId: &'a str,
-        atomicBadge: AtomicBadge,
-        proofs: Vec<&'a str>,
-        validationPolicy: ValidationPolicy,
-        apiVersion: &'a str
-    }
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct TransactionContractWasm {
+    #[serde(alias = "type")]
+    pub type_id: u64,
+    pub version: u64,
+    pub sender: String,
+    pub password: String,
+    pub contract_name: String,
+    pub stored_contract: StoredContractWasm,
+    pub params: Option(Vec<ParamsTransaction>),
+    pub fee: u64,
+    pub timestamp: u64,
+    pub fee_asset_id: String,
+    pub atomic_badge: AtomicBadge,
+    pub validation_policy: ValidationPolicy,
+    pub api_version: String,
 }
