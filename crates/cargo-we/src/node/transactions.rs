@@ -2,14 +2,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct StoredContractWasm {
+pub struct StoredContractWasm {
     pub bytecode: String,
     pub bytecode_hash: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ParamsTransaction {
+pub struct ParamsTransaction {
     pub key: String,
     #[serde(alias = "type")]
     pub type_id: String,
@@ -18,20 +18,20 @@ struct ParamsTransaction {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct AtomicBadge {
+pub struct AtomicBadge {
     pub trustedSender: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct ValidationPolicy {
+pub struct ValidationPolicy {
     #[serde(alias = "type")]
     pub type_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct TransactionContractWasm {
+pub struct TransactionContractWasm {
     #[serde(alias = "type")]
     pub type_id: u64,
     pub version: u64,
@@ -39,7 +39,7 @@ struct TransactionContractWasm {
     pub password: String,
     pub contract_name: String,
     pub stored_contract: StoredContractWasm,
-    pub params: Option(Vec<ParamsTransaction>),
+    pub params: Option<Vec<ParamsTransaction>>,
     pub fee: u64,
     pub timestamp: u64,
     pub fee_asset_id: String,
