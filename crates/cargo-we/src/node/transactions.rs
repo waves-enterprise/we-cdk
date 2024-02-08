@@ -19,7 +19,7 @@ pub struct ParamsTransaction {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AtomicBadge {
-    pub trustedSender: String,
+    pub trusted_sender: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
