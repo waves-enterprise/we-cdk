@@ -1,4 +1,5 @@
 mod metadata;
+pub mod node;
 
 use cargo_metadata::{Message, MetadataCommand};
 use clap::{Args, Parser, Subcommand};
