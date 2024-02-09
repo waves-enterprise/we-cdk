@@ -17,5 +17,5 @@ fn _constructor() {
     // In this case, a balance check is performed.
     require!(balance > 42);
     // Transfer of funds to the `address`.
-    transfer!(address, 42);
+    transfer!(address => address, 42);
 }
