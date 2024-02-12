@@ -1,6 +1,6 @@
 [package]
 name = "we-contract-proc-macro"
-version = "0.1.1"
+version = "0.2.0-rc1"
 edition = "2021"
 authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
 description = "Procedural macros for generating code for WASM contracts"
@@ -15,4 +15,4 @@ repository = "https://github.com/waves-enterprise/we-cdk"
 proc-macro = true
 
 [dependencies]
-we-contract-codegen = { version = "0.1.1", path = "../codegen" }
+we-contract-codegen = { version = "0.2.0-rc1", path = "../codegen" }
