@@ -428,7 +428,7 @@ macro_rules! get_balance {
 /// fn _constructor() {
 ///     let asset_id = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
 ///     let recipient = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
-///     let amount = 100;
+///     let amount: i64 = 100;
 ///     transfer!(address => recipient, amount);
 ///     transfer!(asset => asset_id, address => recipient, amount);
 /// }
@@ -443,9 +443,9 @@ macro_rules! transfer {
             system_token.1,
             $recipient.as_ptr(),
             $recipient.len(),
-            $amount,
             $type,
             $version,
+            $amount,
         );
         error!(error);
     };
@@ -456,9 +456,9 @@ macro_rules! transfer {
             $asset_id.len(),
             $recipient.as_ptr(),
             $recipient.len(),
-            $amount,
             $type,
             $version,
+            $amount,
         );
         error!(error);
     };

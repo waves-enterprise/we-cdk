@@ -13,9 +13,11 @@ fn _constructor() {
     let address = base58!("3NqEjAkFVzem9CGa3bEPhakQc1Sm2G8gAFU");
     let balance = get_balance!(this);
 
+    let amount: Integer = 42;
+
     // Verify inputs and conditions.
     // In this case, a balance check is performed.
-    require!(balance > 42);
+    require!(balance > amount);
     // Transfer of funds to the `address`.
-    transfer!(address => address, 42);
+    transfer!(address => address, amount);
 }
