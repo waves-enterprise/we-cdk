@@ -57,6 +57,20 @@ enum Action {
         #[clap(short, long, value_parser)]
         output: Option<PathBuf>,
     },
+    /// Deploy new contract by using Sign and Broadcast.
+    #[clap(name = "create")]
+    Create {
+        /// The optional target directory for the contract project.
+        #[clap(short, long, value_parser)]
+        path_json: Option<PathBuf>,
+    },
+    /// Update contract by using Sign and Broadcast.
+    #[clap(name = "update")]
+    Update {
+        /// The optional target directory for the contract project.
+        #[clap(short, long, value_parser)]
+        path_json: Option<PathBuf>,
+    },
 }
 
 fn main() -> Result<(), Error> {
@@ -67,6 +81,8 @@ fn main() -> Result<(), Error> {
         Action::Build => build(),
         Action::Wat2Wasm { filename, output } => wat2wasm(filename, output),
         Action::Wasm2Wat { filename, output } => wasm2wat(filename, output),
+        Action::Create { path_json } => create(path_json),
+        Action::Update { path_json } => update(path_json),
     }
 }
 
@@ -292,4 +308,12 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+fn create(path_json: Option<PathBuf>) -> Result<(), Error> {
+    // let json = fs::read_to_string(path_json)?;
+}
+
+fn update(path_json: Option<PathBuf>) -> Result<(), Error> {
+    // let json = fs::read_to_string(path_json)?;
 }
