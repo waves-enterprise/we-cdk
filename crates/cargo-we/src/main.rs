@@ -4,8 +4,11 @@ pub mod node;
 use cargo_metadata::{Message, MetadataCommand};
 use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
+use node::transactions::*;
 use std::{
-    env, fs,
+    env,
+    fmt::format,
+    fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
@@ -311,9 +314,35 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
 }
 
 fn create(path_json: Option<PathBuf>) -> Result<(), Error> {
-    // let json = fs::read_to_string(path_json)?;
+    let path = match path_json {
+        Some(path) => path
+            .as_os_str()
+            .to_str()
+            .expect("Failed to cast to string")
+            .to_string(),
+        None => {
+            let path = env::current_dir().expect("Failed to get current dir");
+            path.as_os_str()
+                .to_str()
+                .expect("Failed to cast to string")
+                .to_string()
+        }
+    };
+    let json = format!("{}/transaction.json", path);
+    let node_config = format!("{}/node_config.json", path);
+    let file = fs::read_to_string(json).expect("Can't read file");
+    let transaction_create =
+        serde_json::from_str::<TransactionContractWasm>(&file).expect("Can't parse json");
+    let node_config_file = fs::read_to_string(node_config).expect("Can't read file");
+    let node_config =
+        serde_json::from_str::<NodeConfig>(&node_config_file).expect("Can't parse json");
+    let node = node::Node::from_url(node_config.node_url);
+    let _res = node.transaction_sign_and_broadcast(node_config.api_key, transaction_create);
+
+    Ok(())
 }
 
 fn update(path_json: Option<PathBuf>) -> Result<(), Error> {
     // let json = fs::read_to_string(path_json)?;
+    Ok(())
 }

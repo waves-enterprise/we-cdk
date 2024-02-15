@@ -47,3 +47,10 @@ pub struct TransactionContractWasm {
     pub validation_policy: ValidationPolicy,
     pub api_version: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NodeConfig {
+    pub node_url: String,
+    pub api_key: String,
+}
