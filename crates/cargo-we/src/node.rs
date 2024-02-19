@@ -24,6 +24,8 @@ impl Node {
         let json_temp = serde_json::to_string(&tx).expect("Failed to serialize json");
         let response = client
             .post(url)
+            .header("accept", "application/json")
+            .header("Content-Type", "application/json")
             .header("X-API-Key", api_key)
             .body(json_temp)
             .send()

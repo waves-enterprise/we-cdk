@@ -11,9 +11,9 @@ pub struct StoredContractWasm {
 #[serde(rename_all = "camelCase")]
 pub struct ParamsTransaction {
     pub key: String,
-    #[serde(alias = "type")]
+    #[serde(rename = "type")]
     pub type_id: String,
-    pub value: String,
+    pub value: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -25,32 +25,54 @@ pub struct AtomicBadge {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ValidationPolicy {
-    #[serde(alias = "type")]
+    #[serde(rename = "type")]
     pub type_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionContractWasm {
-    #[serde(alias = "type")]
-    pub type_id: u64,
-    pub version: u64,
+    #[serde(rename = "type")]
+    pub type_id: Option<u64>,
+    pub version: Option<u64>,
     pub sender: String,
     pub password: String,
     pub contract_name: String,
-    pub stored_contract: StoredContractWasm,
+    pub stored_contract: Option<StoredContractWasm>,
     pub params: Option<Vec<ParamsTransaction>>,
-    pub fee: u64,
-    pub timestamp: u64,
-    pub fee_asset_id: String,
-    pub atomic_badge: AtomicBadge,
+    pub payments: Option<Vec<ContractTransferInV1>>,
+    pub fee: Option<u64>,
+    pub fee_asset_id: Option<String>,
     pub validation_policy: ValidationPolicy,
-    pub api_version: String,
+    pub is_confidential: bool,
+    pub group_participants: Vec<String>,
+    pub group_owners: Vec<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ContractTransferInV1 {
+    asset_id: Option<String>,
+    amount: u64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct NodeConfig {
+pub struct Config {
     pub node_url: String,
     pub api_key: String,
+    pub transaction: TransactionContractWasm,
 }
+// sender: String,
+// contractName: String,
+// storedContract: StoredContract,
+// params: List[DataEntry[_]],
+// payments: List[ContractTransferInV1],
+// fee: Long,
+// feeAssetId: Option[String],
+// timestamp: Option[Long] = None,
+// atomicBadge: Option[AtomicBadge],
+// validationPolicy: ValidationPolicy,
+// password: Option[String] = None,
+// isConfidential: Boolean,
+// groupParticipants: List[String],
+// groupOwners: List[String])

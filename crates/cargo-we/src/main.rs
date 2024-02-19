@@ -1,18 +1,25 @@
 mod metadata;
 pub mod node;
 
+use base64::{
+    alphabet,
+    engine::{self, general_purpose},
+    Engine as _,
+};
+use chrono::{Datelike, Timelike, Utc};
+use sha256::digest;
+
 use cargo_metadata::{Message, MetadataCommand};
 use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
-use node::transactions::*;
+use node::transactions::{self, *};
 use std::{
-    env,
-    fmt::format,
-    fs,
+    env, fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
+use syn::Data;
 
 const TARGET_WE: &str = "target/we";
 
@@ -65,7 +72,8 @@ enum Action {
     Create {
         /// The optional target directory for the contract project.
         #[clap(short, long, value_parser)]
-        path_json: Option<PathBuf>,
+        path_json: PathBuf,
+        flag: bool,
     },
     /// Update contract by using Sign and Broadcast.
     #[clap(name = "update")]
@@ -76,7 +84,8 @@ enum Action {
     },
 }
 
-fn main() -> Result<(), Error> {
+#[tokio::main]
+async fn main() -> Result<(), Error> {
     let Cli::We(args) = Cli::parse();
 
     match args.action {
@@ -84,7 +93,7 @@ fn main() -> Result<(), Error> {
         Action::Build => build(),
         Action::Wat2Wasm { filename, output } => wat2wasm(filename, output),
         Action::Wasm2Wat { filename, output } => wasm2wat(filename, output),
-        Action::Create { path_json } => create(path_json),
+        Action::Create { path_json, flag } => create(path_json, flag).await,
         Action::Update { path_json } => update(path_json),
     }
 }
@@ -313,31 +322,45 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
     Ok(())
 }
 
-fn create(path_json: Option<PathBuf>) -> Result<(), Error> {
-    let path = match path_json {
-        Some(path) => path
-            .as_os_str()
-            .to_str()
-            .expect("Failed to cast to string")
-            .to_string(),
+async fn create(path_json: PathBuf, flag: bool) -> Result<(), Error> {
+    let file = fs::read_to_string(path_json).expect("Can't read file");
+    let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
+    let _stored_contract = match config.transaction.stored_contract {
+        Some(str_contract) => str_contract,
         None => {
-            let path = env::current_dir().expect("Failed to get current dir");
-            path.as_os_str()
-                .to_str()
-                .expect("Failed to cast to string")
-                .to_string()
+            let bytecode = fs::read("target/we/counter.wasm").expect("Can't read file");
+            let bytecode_hash = digest(bytecode.clone());
+            StoredContractWasm {
+                bytecode: general_purpose::STANDARD.encode(&bytecode),
+                bytecode_hash,
+            }
         }
     };
-    let json = format!("{}/transaction.json", path);
-    let node_config = format!("{}/node_config.json", path);
-    let file = fs::read_to_string(json).expect("Can't read file");
-    let transaction_create =
-        serde_json::from_str::<TransactionContractWasm>(&file).expect("Can't parse json");
-    let node_config_file = fs::read_to_string(node_config).expect("Can't read file");
-    let node_config =
-        serde_json::from_str::<NodeConfig>(&node_config_file).expect("Can't parse json");
-    let node = node::Node::from_url(node_config.node_url);
-    let _res = node.transaction_sign_and_broadcast(node_config.api_key, transaction_create);
+
+    let transaction_create = TransactionContractWasm {
+        type_id: Some(103),
+        version: Some(7),
+        sender: config.transaction.sender,
+        password: config.transaction.password,
+        contract_name: config.transaction.contract_name,
+        stored_contract: Some(_stored_contract),
+        params: config.transaction.params,
+        payments: config.transaction.payments,
+        fee: config.transaction.fee,
+        fee_asset_id: config.transaction.fee_asset_id,
+        validation_policy: config.transaction.validation_policy,
+        is_confidential: config.transaction.is_confidential,
+        group_participants: config.transaction.group_participants,
+        group_owners: config.transaction.group_owners,
+    };
+
+    let node = node::Node::from_url(config.node_url);
+
+    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
+    print!("{}\n", json);
+    let _res = node
+        .transaction_sign_and_broadcast(config.api_key, transaction_create)
+        .await;
 
     Ok(())
 }
