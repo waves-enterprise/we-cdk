@@ -2,6 +2,36 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[serde(untagged)]
+pub enum DataEntry {
+    DataString {
+        key: String,
+        #[serde(rename = "type")]
+        type_id: String,
+        value: String,
+    },
+    DataInteger {
+        key: String,
+        #[serde(rename = "type")]
+        type_id: String,
+        value: u64,
+    },
+    DataBoolean {
+        key: String,
+        #[serde(rename = "type")]
+        type_id: String,
+        value: bool,
+    },
+    DataBinary {
+        key: String,
+        #[serde(rename = "type")]
+        type_id: String,
+        value: Vec<u8>,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct StoredContractWasm {
     pub bytecode: String,
     pub bytecode_hash: String,
@@ -39,7 +69,7 @@ pub struct TransactionContractWasm {
     pub password: String,
     pub contract_name: String,
     pub stored_contract: Option<StoredContractWasm>,
-    pub params: Option<Vec<ParamsTransaction>>,
+    pub params: Option<Vec<DataEntry>>,
     pub payments: Option<Vec<ContractTransferInV1>>,
     pub fee: Option<u64>,
     pub fee_asset_id: Option<String>,
