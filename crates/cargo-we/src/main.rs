@@ -326,45 +326,15 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
 async fn create(flag: Option<bool>, path_json: PathBuf) -> Result<(), Error> {
     let file = fs::read_to_string(path_json).expect("Can't read file");
     let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
-    let transaction_create = transaction_create(&config, 107, 6);
-
-    let node = node::Node::from_url(config.node_url);
-    let api = config.api_key;
-
-    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
-    print!("{}\n", json);
-
-    match flag {
-        Some(true) => Ok(()),
-        _ => {
-            let _res = node
-                .transaction_sign_and_broadcast(api, transaction_create)
-                .await;
-            Ok(())
-        }
-    }
+    let transaction_create = transaction_create(config, 103, 7, flag);
+    transaction_create.await
 }
 
 async fn update(flag: Option<bool>, path_json: PathBuf) -> Result<(), Error> {
     let file = fs::read_to_string(path_json).expect("Can't read file");
     let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
-    let transaction_create = transaction_create(&config, 107, 6);
-
-    let node = node::Node::from_url(config.node_url);
-    let api = config.api_key;
-
-    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
-    print!("{}\n", json);
-
-    match flag {
-        Some(true) => Ok(()),
-        _ => {
-            let _res = node
-                .transaction_sign_and_broadcast(api, transaction_create)
-                .await;
-            Ok(())
-        }
-    }
+    let transaction_create = transaction_create(config, 107, 6, flag);
+    transaction_create.await
 }
 
 fn check_stored_contract(_stored_contract: Option<StoredContractWasm>) -> StoredContractWasm {
@@ -392,7 +362,12 @@ fn check_stored_contract(_stored_contract: Option<StoredContractWasm>) -> Stored
     }
 }
 
-fn transaction_create(config: &Config, type_id: u64, version: u64) -> TransactionContractWasm {
+async fn transaction_create(
+    config: Config,
+    type_id: u64,
+    version: u64,
+    flag: Option<bool>,
+) -> Result<(), Error> {
     let _stored_contract = check_stored_contract(config.transaction.stored_contract);
 
     let transaction_create = TransactionContractWasm {
@@ -411,5 +386,20 @@ fn transaction_create(config: &Config, type_id: u64, version: u64) -> Transactio
         group_participants: config.transaction.group_participants,
         group_owners: config.transaction.group_owners,
     };
-    transaction_create
+
+    let node = node::Node::from_url(config.node_url);
+    let api = config.api_key;
+
+    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
+    print!("{}\n", json);
+
+    match flag {
+        Some(true) => Ok(()),
+        _ => {
+            let _res = node
+                .transaction_sign_and_broadcast(api, transaction_create)
+                .await;
+            Ok(())
+        }
+    }
 }
