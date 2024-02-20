@@ -68,6 +68,7 @@ pub struct TransactionContractWasm {
     pub sender: String,
     pub password: String,
     pub contract_name: String,
+    pub contract_id: Option<String>,
     pub stored_contract: Option<StoredContractWasm>,
     pub params: Option<Vec<DataEntry>>,
     pub payments: Option<Vec<ContractTransferInV1>>,

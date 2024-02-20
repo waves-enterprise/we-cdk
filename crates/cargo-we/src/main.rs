@@ -377,6 +377,10 @@ async fn transaction_create(
         password: config.transaction.password,
         contract_name: config.transaction.contract_name,
         stored_contract: Some(_stored_contract),
+        contract_id: match type_id {
+            107 => config.transaction.contract_id,
+            _ => None,
+        },
         params: config.transaction.params,
         payments: config.transaction.payments,
         fee: config.transaction.fee,
