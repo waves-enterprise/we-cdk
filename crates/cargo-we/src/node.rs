@@ -15,7 +15,7 @@ impl Node {
         Node { url, api_key }
     }
 
-    pub async fn transaction_sign_and_broadcast(&self, tx: TransactionContractWasm) -> Result<()> {
+    pub async fn transaction_sign_and_broadcast(&self, tx: Transaction) -> Result<()> {
         let url = format!("{}/transactions/signAndBroadcast", self.url);
         let client = reqwest::Client::new();
         let json_temp = serde_json::to_string(&tx).expect("Failed to serialize json");

@@ -31,6 +31,39 @@ pub enum DataEntry {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum TxContract {
+    CreateContract {
+        params: Vec<DataEntry>,
+        payments: Vec<ContractTransferInV1>,
+    },
+    UpdateContract {
+        #[serde(rename = "contractId")]
+        contract_id: String,
+    },
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Transaction {
+    #[serde(rename = "type")]
+    pub type_id: u64,
+    pub version: u64,
+    pub sender: String,
+    pub password: String,
+    pub contract_name: String,
+    pub stored_contract: StoredContractWasm,
+    #[serde(flatten)]
+    pub tx: TxContract,
+    pub fee: u64,
+    pub fee_asset_id: Option<String>,
+    pub validation_policy: ValidationPolicy,
+    pub is_confidential: bool,
+    pub group_participants: Vec<String>,
+    pub group_owners: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StoredContractWasm {
     pub bytecode: String,
@@ -97,22 +130,12 @@ pub struct Config {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Transaction {
-    #[serde(rename = "type")]
-    pub type_id: u64,
-    pub version: u64,
-    pub sender: String,
-    pub password: String,
-    pub contract_name: String,
-    pub stored_contract: Option<StoredContractWasm>,
-    pub payments: Option<Vec<ContractTransferInV1>>,
-    pub fee: Option<u64>,
-    pub fee_asset_id: Option<String>,
-    pub validation_policy: ValidationPolicy,
-    pub is_confidential: bool,
-    pub group_participants: Vec<String>,
-    pub group_owners: Vec<String>,
+pub struct ConfigTx {
+    pub node_url: String,
+    pub api_key: String,
+    pub transaction: Transaction,
 }
+
 // sender: String,
 // contractName: String,
 // storedContract: StoredContract,
