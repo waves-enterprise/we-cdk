@@ -79,6 +79,7 @@ pub struct TransactionContractWasm {
     pub group_participants: Vec<String>,
     pub group_owners: Vec<String>,
 }
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContractTransferInV1 {
@@ -92,6 +93,25 @@ pub struct Config {
     pub node_url: String,
     pub api_key: String,
     pub transaction: TransactionContractWasm,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Transaction {
+    #[serde(rename = "type")]
+    pub type_id: u64,
+    pub version: u64,
+    pub sender: String,
+    pub password: String,
+    pub contract_name: String,
+    pub stored_contract: Option<StoredContractWasm>,
+    pub payments: Option<Vec<ContractTransferInV1>>,
+    pub fee: Option<u64>,
+    pub fee_asset_id: Option<String>,
+    pub validation_policy: ValidationPolicy,
+    pub is_confidential: bool,
+    pub group_participants: Vec<String>,
+    pub group_owners: Vec<String>,
 }
 // sender: String,
 // contractName: String,

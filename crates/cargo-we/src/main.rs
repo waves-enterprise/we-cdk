@@ -1,25 +1,19 @@
 mod metadata;
 pub mod node;
 
-use base64::{
-    alphabet,
-    engine::{self, general_purpose},
-    Engine as _,
-};
-use chrono::{Datelike, Timelike, Utc};
+use base64::{engine::general_purpose, Engine as _};
 use sha256::digest;
 
-use cargo_metadata::{semver::Version, Message, MetadataCommand};
-use clap::{builder::Str, Args, Parser, Subcommand};
+use cargo_metadata::{Message, MetadataCommand};
+use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
-use node::transactions::{self, *};
+use node::transactions::*;
 use std::{
     env, fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
 };
-use syn::Data;
 
 const TARGET_WE: &str = "target/we";
 
@@ -391,8 +385,7 @@ async fn transaction_create(
         group_owners: config.transaction.group_owners,
     };
 
-    let node = node::Node::from_url(config.node_url);
-    let api = config.api_key;
+    let node = node::Node::new(config.node_url, config.api_key);
 
     let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
     print!("{}\n", json);
@@ -401,7 +394,7 @@ async fn transaction_create(
         Some(true) => Ok(()),
         _ => {
             let _res = node
-                .transaction_sign_and_broadcast(api, transaction_create)
+                .transaction_sign_and_broadcast(transaction_create)
                 .await;
             Ok(())
         }
