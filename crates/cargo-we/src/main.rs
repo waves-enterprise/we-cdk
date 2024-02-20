@@ -9,8 +9,8 @@ use base64::{
 use chrono::{Datelike, Timelike, Utc};
 use sha256::digest;
 
-use cargo_metadata::{Message, MetadataCommand};
-use clap::{Args, Parser, Subcommand};
+use cargo_metadata::{semver::Version, Message, MetadataCommand};
+use clap::{builder::Str, Args, Parser, Subcommand};
 use metadata::Metadata;
 use node::transactions::{self, *};
 use std::{
@@ -70,17 +70,18 @@ enum Action {
     /// Deploy new contract by using Sign and Broadcast.
     #[clap(name = "create")]
     Create {
+        flag: Option<bool>,
         /// The optional target directory for the contract project.
         #[clap(short, long, value_parser)]
         path_json: PathBuf,
-        flag: bool,
     },
     /// Update contract by using Sign and Broadcast.
     #[clap(name = "update")]
     Update {
+        flag: Option<bool>,
         /// The optional target directory for the contract project.
         #[clap(short, long, value_parser)]
-        path_json: Option<PathBuf>,
+        path_json: PathBuf,
     },
 }
 
@@ -93,8 +94,8 @@ async fn main() -> Result<(), Error> {
         Action::Build => build(),
         Action::Wat2Wasm { filename, output } => wat2wasm(filename, output),
         Action::Wasm2Wat { filename, output } => wasm2wat(filename, output),
-        Action::Create { path_json, flag } => create(path_json, flag).await,
-        Action::Update { path_json } => update(path_json),
+        Action::Create { flag, path_json } => create(flag, path_json).await,
+        Action::Update { flag, path_json } => update(flag, path_json).await,
     }
 }
 
@@ -322,24 +323,81 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
     Ok(())
 }
 
-async fn create(path_json: PathBuf, flag: bool) -> Result<(), Error> {
+async fn create(flag: Option<bool>, path_json: PathBuf) -> Result<(), Error> {
     let file = fs::read_to_string(path_json).expect("Can't read file");
     let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
-    let _stored_contract = match config.transaction.stored_contract {
+    let transaction_create = transaction_create(&config, 107, 6);
+
+    let node = node::Node::from_url(config.node_url);
+    let api = config.api_key;
+
+    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
+    print!("{}\n", json);
+
+    match flag {
+        Some(true) => Ok(()),
+        _ => {
+            let _res = node
+                .transaction_sign_and_broadcast(api, transaction_create)
+                .await;
+            Ok(())
+        }
+    }
+}
+
+async fn update(flag: Option<bool>, path_json: PathBuf) -> Result<(), Error> {
+    let file = fs::read_to_string(path_json).expect("Can't read file");
+    let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
+    let transaction_create = transaction_create(&config, 107, 6);
+
+    let node = node::Node::from_url(config.node_url);
+    let api = config.api_key;
+
+    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
+    print!("{}\n", json);
+
+    match flag {
+        Some(true) => Ok(()),
+        _ => {
+            let _res = node
+                .transaction_sign_and_broadcast(api, transaction_create)
+                .await;
+            Ok(())
+        }
+    }
+}
+
+fn check_stored_contract(_stored_contract: Option<StoredContractWasm>) -> StoredContractWasm {
+    match _stored_contract {
         Some(str_contract) => str_contract,
         None => {
-            let bytecode = fs::read("target/we/counter.wasm").expect("Can't read file");
+            let metadata = MetadataCommand::new()
+                .manifest_path("Cargo.toml")
+                .exec()
+                .expect("Unable to runs `cargo metadata`");
+
+            let project_name = metadata
+                .root_package()
+                .expect("Unable to get root package")
+                .name
+                .as_str();
+            let path_wasm = format!("{}/{}.wasm", TARGET_WE, project_name);
+            let bytecode = fs::read(path_wasm).expect("Can't read file");
             let bytecode_hash = digest(bytecode.clone());
             StoredContractWasm {
                 bytecode: general_purpose::STANDARD.encode(&bytecode),
                 bytecode_hash,
             }
         }
-    };
+    }
+}
+
+fn transaction_create(config: &Config, type_id: u64, version: u64) -> TransactionContractWasm {
+    let _stored_contract = check_stored_contract(config.transaction.stored_contract);
 
     let transaction_create = TransactionContractWasm {
-        type_id: Some(103),
-        version: Some(7),
+        type_id: Some(type_id),
+        version: Some(version),
         sender: config.transaction.sender,
         password: config.transaction.password,
         contract_name: config.transaction.contract_name,
@@ -353,19 +411,5 @@ async fn create(path_json: PathBuf, flag: bool) -> Result<(), Error> {
         group_participants: config.transaction.group_participants,
         group_owners: config.transaction.group_owners,
     };
-
-    let node = node::Node::from_url(config.node_url);
-
-    let json = serde_json::to_string(&transaction_create).expect("Failed to serialize json");
-    print!("{}\n", json);
-    let _res = node
-        .transaction_sign_and_broadcast(config.api_key, transaction_create)
-        .await;
-
-    Ok(())
-}
-
-fn update(path_json: Option<PathBuf>) -> Result<(), Error> {
-    // let json = fs::read_to_string(path_json)?;
-    Ok(())
+    transaction_create
 }
