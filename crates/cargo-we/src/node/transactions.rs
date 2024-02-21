@@ -34,16 +34,14 @@ pub enum DataEntry {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum TxContract {
+    #[serde(rename_all = "camelCase")]
     CreateContract {
-        #[serde(rename = "contractName")]
         contract_name: String,
         params: Vec<DataEntry>,
         payments: Vec<ContractTransferInV1>,
     },
-    UpdateContract {
-        #[serde(rename = "contractId")]
-        contract_id: String,
-    },
+    #[serde(rename_all = "camelCase")]
+    UpdateContract { contract_id: String },
 }
 
 #[derive(Debug, Serialize, Deserialize)]
