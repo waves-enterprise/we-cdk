@@ -27,11 +27,17 @@ impl Node {
             .send()
             .await?;
 
-        println!("HTTP Status code: {}", response.status());
+        let status = response.status();
 
         let response_body = response.text().await?;
 
         println!("Response body:\n{}", response_body);
+
+        if status == 200 {
+            println!("Successful send transaction");
+        } else {
+            println!("Error send transaction. HTTP Response status: {}", status);
+        }
 
         Ok(())
     }
