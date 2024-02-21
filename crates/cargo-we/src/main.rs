@@ -9,7 +9,9 @@ use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
 use node::transactions::*;
 use std::{
-    env, fs,
+    env,
+    fmt::Debug,
+    fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
@@ -313,32 +315,31 @@ async fn tx(send: bool, path_json: PathBuf) -> Result<(), Error> {
     let file = fs::read_to_string(path_json).expect("Can't read file");
     let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
     let mut transaction = config.transaction;
-    if transaction.type_id == 107 || transaction.type_id == 103 {
-        transaction.stored_contract = {
-            let metadata = MetadataCommand::new()
-                .manifest_path("Cargo.toml")
-                .exec()
-                .expect("Unable to runs `cargo metadata`");
+    transaction.stored_contract = {
+        let metadata = MetadataCommand::new()
+            .manifest_path("Cargo.toml")
+            .exec()
+            .expect("Unable to runs `cargo metadata`");
 
-            let project_name = metadata
-                .root_package()
-                .expect("Unable to get root package")
-                .name
-                .as_str();
-            let path_wasm = format!("{}/{}.wasm", TARGET_WE, project_name);
-            let bytecode = fs::read(path_wasm).expect("Can't read file");
-            let bytecode_hash = digest(bytecode.clone());
-            Option::from(StoredContractWasm {
-                bytecode: general_purpose::STANDARD.encode(&bytecode),
-                bytecode_hash,
-            })
-        };
-    }
-    let json = serde_json::to_string(&transaction).expect("Failed to serialize json");
-    print!("Transaction before send: {}\n", json);
+        let project_name = metadata
+            .root_package()
+            .expect("Unable to get root package")
+            .name
+            .as_str();
+        let path_wasm = format!("{}/{}.wasm", TARGET_WE, project_name);
+        let bytecode = fs::read(path_wasm).expect("Can't read file");
+        let bytecode_hash = digest(bytecode.clone());
+        Option::from(StoredContractWasm {
+            bytecode: general_purpose::STANDARD.encode(&bytecode),
+            bytecode_hash,
+        })
+    };
+
     if send == true {
         let node = node::Node::new(config.node_url, config.api_key);
         let _res = node.transaction_sign_and_broadcast(transaction).await;
+    } else {
+        println!("{}", transaction);
     }
     Ok(())
 }

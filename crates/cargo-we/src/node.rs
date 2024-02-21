@@ -15,20 +15,19 @@ impl Node {
         Node { url, api_key }
     }
 
-    pub async fn transaction_sign_and_broadcast(&self, tx: Transaction) -> Result<()> {
+    pub async fn transaction_sign_and_broadcast(&self, tx: TransactionContract) -> Result<()> {
         let url = format!("{}/transactions/signAndBroadcast", self.url);
         let client = reqwest::Client::new();
-        let json_temp = serde_json::to_string(&tx).expect("Failed to serialize json");
         let response = client
             .post(url)
             .header("accept", "application/json")
             .header("Content-Type", "application/json")
             .header("X-API-Key", &self.api_key)
-            .body(json_temp)
+            .body(tx.as_json())
             .send()
             .await?;
 
-        println!("Status: {}", response.status());
+        println!("HTTP Status code: {}", response.status());
 
         let response_body = response.text().await?;
 

@@ -1,28 +1,29 @@
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[serde(untagged)]
 pub enum DataEntry {
-    DataString {
+    String {
         key: String,
         #[serde(rename = "type")]
         type_: String,
         value: String,
     },
-    DataInteger {
+    Integer {
         key: String,
         #[serde(rename = "type")]
         type_: String,
         value: u64,
     },
-    DataBoolean {
+    Boolean {
         key: String,
         #[serde(rename = "type")]
         type_: String,
         value: bool,
     },
-    DataBinary {
+    Binary {
         key: String,
         #[serde(rename = "type")]
         type_: String,
@@ -34,6 +35,8 @@ pub enum DataEntry {
 #[serde(untagged)]
 pub enum TxContract {
     CreateContract {
+        #[serde(rename = "contractName")]
+        contract_name: String,
         params: Vec<DataEntry>,
         payments: Vec<ContractTransferInV1>,
     },
@@ -45,13 +48,12 @@ pub enum TxContract {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Transaction {
+pub struct TransactionContract {
     #[serde(rename = "type")]
     pub type_id: u64,
     pub version: u64,
     pub sender: String,
     pub password: String,
-    pub contract_name: String,
     pub stored_contract: Option<StoredContractWasm>,
     #[serde(flatten)]
     pub tx: TxContract,
@@ -95,5 +97,17 @@ pub struct ContractTransferInV1 {
 pub struct Config {
     pub node_url: String,
     pub api_key: String,
-    pub transaction: Transaction,
+    pub transaction: TransactionContract,
+}
+
+impl TransactionContract {
+    pub fn as_json(&self) -> String {
+        serde_json::to_string(self).expect("Unable to serialize struct to JSON")
+    }
+}
+
+impl fmt::Display for TransactionContract {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_json())
+    }
 }
