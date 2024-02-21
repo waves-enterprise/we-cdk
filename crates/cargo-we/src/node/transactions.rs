@@ -52,7 +52,7 @@ pub struct Transaction {
     pub sender: String,
     pub password: String,
     pub contract_name: String,
-    pub stored_contract: StoredContractWasm,
+    pub stored_contract: Option<StoredContractWasm>,
     #[serde(flatten)]
     pub tx: TxContract,
     pub fee: u64,
