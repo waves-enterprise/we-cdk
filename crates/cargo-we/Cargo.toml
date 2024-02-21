@@ -15,12 +15,11 @@ repository = "https://github.com/waves-enterprise/we-cdk"
 cargo_metadata = "0.18.0"
 clap = { version = "4.4.6", features = ["derive"] }
 reqwest = { version = "0.11.12", features = ["json"] }
-tokio = { version = "1.28.2", features = ["full"] }
-serde = { version = "1.0.145", features = ["derive"] }
-serde_json = "1.0.113" 
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1" 
 sha256 = "1.5.0"
 base64 = "0.21.7"
-chrono = "0.4.34"
 syn = { version = "1", features = ["full", "extra-traits"] }
 wasmprinter = "0.2"
 wat = "1"
