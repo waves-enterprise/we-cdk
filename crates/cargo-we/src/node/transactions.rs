@@ -94,38 +94,9 @@ pub struct ValidationPolicy {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct TransactionContractWasm {
-    #[serde(rename = "type")]
-    pub type_id: Option<u64>,
-    pub version: Option<u64>,
-    pub sender: String,
-    pub password: String,
-    pub contract_name: String,
-    pub contract_id: Option<String>,
-    pub stored_contract: Option<StoredContractWasm>,
-    pub params: Option<Vec<DataEntry>>,
-    pub payments: Option<Vec<ContractTransferInV1>>,
-    pub fee: Option<u64>,
-    pub fee_asset_id: Option<String>,
-    pub validation_policy: ValidationPolicy,
-    pub is_confidential: bool,
-    pub group_participants: Vec<String>,
-    pub group_owners: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ContractTransferInV1 {
     asset_id: Option<String>,
     amount: u64,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Config {
-    pub node_url: String,
-    pub api_key: String,
-    pub transaction: TransactionContractWasm,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
