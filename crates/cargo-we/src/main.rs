@@ -1,5 +1,5 @@
 mod metadata;
-pub mod node;
+mod node;
 
 use base64::{engine::general_purpose, Engine as _};
 use sha256::digest;
@@ -311,7 +311,7 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
 
 async fn tx(send: bool, path_json: PathBuf) -> Result<(), Error> {
     let file = fs::read_to_string(path_json).expect("Can't read file");
-    let config: ConfigTx = serde_json::from_str::<ConfigTx>(&file).expect("Can't parse json");
+    let config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
     let mut transaction = config.transaction;
     if transaction.type_id == 107 || transaction.type_id == 103 {
         transaction.stored_contract = {
@@ -335,14 +335,10 @@ async fn tx(send: bool, path_json: PathBuf) -> Result<(), Error> {
         };
     }
     let json = serde_json::to_string(&transaction).expect("Failed to serialize json");
-    print!("{}\n", json);
-    match send {
-        false => Ok(()),
-        true => {
-            let node = node::Node::new(config.node_url, config.api_key);
-
-            let _res = node.transaction_sign_and_broadcast(transaction).await;
-            Ok(())
-        }
+    print!("Transaction before send: {}\n", json);
+    if send == true {
+        let node = node::Node::new(config.node_url, config.api_key);
+        let _res = node.transaction_sign_and_broadcast(transaction).await;
     }
+    Ok(())
 }

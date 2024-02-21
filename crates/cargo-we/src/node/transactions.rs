@@ -7,25 +7,25 @@ pub enum DataEntry {
     DataString {
         key: String,
         #[serde(rename = "type")]
-        type_id: String,
+        type_: String,
         value: String,
     },
     DataInteger {
         key: String,
         #[serde(rename = "type")]
-        type_id: String,
+        type_: String,
         value: u64,
     },
     DataBoolean {
         key: String,
         #[serde(rename = "type")]
-        type_id: String,
+        type_: String,
         value: bool,
     },
     DataBinary {
         key: String,
         #[serde(rename = "type")]
-        type_id: String,
+        type_: String,
         value: Vec<u8>,
     },
 }
@@ -72,15 +72,6 @@ pub struct StoredContractWasm {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ParamsTransaction {
-    pub key: String,
-    #[serde(rename = "type")]
-    pub type_id: String,
-    pub value: u64,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct AtomicBadge {
     pub trusted_sender: String,
 }
@@ -101,23 +92,8 @@ pub struct ContractTransferInV1 {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ConfigTx {
+pub struct Config {
     pub node_url: String,
     pub api_key: String,
     pub transaction: Transaction,
 }
-
-// sender: String,
-// contractName: String,
-// storedContract: StoredContract,
-// params: List[DataEntry[_]],
-// payments: List[ContractTransferInV1],
-// fee: Long,
-// feeAssetId: Option[String],
-// timestamp: Option[Long] = None,
-// atomicBadge: Option[AtomicBadge],
-// validationPolicy: ValidationPolicy,
-// password: Option[String] = None,
-// isConfidential: Boolean,
-// groupParticipants: List[String],
-// groupOwners: List[String])
