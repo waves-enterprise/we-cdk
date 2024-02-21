@@ -335,11 +335,11 @@ async fn tx(send: bool, path_json: PathBuf) -> Result<(), Error> {
         })
     };
 
-    if send == true {
+    if send {
         let node = node::Node::new(config.node_url, config.api_key);
         let _res = node.transaction_sign_and_broadcast(transaction).await;
     } else {
-        println!("{}", transaction);
+        println!("Transaction before send:{}", transaction);
     }
     Ok(())
 }
