@@ -1,10 +1,16 @@
 mod metadata;
+mod node;
 
+use base64::{engine::general_purpose, Engine as _};
 use cargo_metadata::{Message, MetadataCommand};
 use clap::{Args, Parser, Subcommand};
 use metadata::Metadata;
+use node::transactions::*;
+use sha256::digest;
 use std::{
-    env, fs,
+    env,
+    fmt::Debug,
+    fs,
     io::{Error, Write},
     path::{Path, PathBuf},
     process::{Command, Stdio},
@@ -56,9 +62,19 @@ enum Action {
         #[clap(short, long, value_parser)]
         output: Option<PathBuf>,
     },
+    /// Send tx by using Sign and Broadcast.
+    #[clap(name = "tx")]
+    Tx {
+        /// Path to the transaction JSON configuration file
+        path_json: PathBuf,
+        /// Send the transaction flag
+        #[clap(short, long, default_value_t = false)]
+        send: bool,
+    },
 }
 
-fn main() -> Result<(), Error> {
+#[tokio::main]
+async fn main() -> Result<(), Error> {
     let Cli::We(args) = Cli::parse();
 
     match args.action {
@@ -66,6 +82,7 @@ fn main() -> Result<(), Error> {
         Action::Build => build(),
         Action::Wat2Wasm { filename, output } => wat2wasm(filename, output),
         Action::Wasm2Wat { filename, output } => wasm2wat(filename, output),
+        Action::Tx { path_json, send } => tx(path_json, send).await,
     }
 }
 
@@ -288,6 +305,44 @@ fn wasm2wat(filename: PathBuf, output: Option<PathBuf>) -> Result<(), Error> {
             file.write_all(wat.as_bytes())?;
         }
         None => println!("{}", wat),
+    }
+
+    Ok(())
+}
+
+async fn tx(path_json: PathBuf, send: bool) -> Result<(), Error> {
+    let file = fs::read_to_string(path_json).expect("Can't read file");
+    let mut config: Config = serde_json::from_str::<Config>(&file).expect("Can't parse json");
+
+    let metadata = MetadataCommand::new()
+        .manifest_path("Cargo.toml")
+        .exec()
+        .expect("Unable to runs `cargo metadata`");
+
+    let project_name = metadata
+        .root_package()
+        .expect("Unable to get root package")
+        .name
+        .as_str();
+
+    let path_wasm = format!("{}/{}.wasm", TARGET_WE, project_name);
+
+    let bytecode = fs::read(path_wasm).expect("Can't read file");
+    let bytecode_hash = digest(bytecode.clone());
+
+    let stored_contract = StoredContractWasm {
+        bytecode: general_purpose::STANDARD.encode(&bytecode),
+        bytecode_hash,
+    };
+    config.transaction.set_stored_contract(stored_contract);
+
+    if send {
+        let node = node::Node::new(config.node_url, config.api_key);
+        node.transaction_sign_and_broadcast(config.transaction)
+            .await
+            .expect("Failed to execute the request")
+    } else {
+        println!("Transaction before send:{}", config.transaction);
     }
 
     Ok(())
