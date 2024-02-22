@@ -1,9 +1,6 @@
 pub mod transactions;
 
-use reqwest::Error;
-use transactions::*;
-
-pub type Result<T> = std::result::Result<T, Error>;
+use transactions::ContractTransaction;
 
 pub struct Node {
     url: String,
@@ -15,7 +12,10 @@ impl Node {
         Node { url, api_key }
     }
 
-    pub async fn transaction_sign_and_broadcast(&self, tx: TransactionContract) -> Result<()> {
+    pub async fn transaction_sign_and_broadcast(
+        &self,
+        tx: ContractTransaction,
+    ) -> Result<(), reqwest::Error> {
         let url = format!("{}/transactions/signAndBroadcast", self.url);
         let client = reqwest::Client::new();
         let response = client
@@ -28,11 +28,9 @@ impl Node {
             .await?;
 
         let status = response.status();
-
         let response_body = response.text().await?;
 
         println!("Response body:\n{}", response_body);
-
         if status == 200 {
             println!("Successful send transaction");
         } else {
