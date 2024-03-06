@@ -5,7 +5,7 @@ use we_cdk::*;
 #[action]
 fn _constructor(int_value: Integer) {
     set_storage!(integer :: "count" => int_value);
-    set_storage!(binary :: "owner" => get_tx_sender!());
+    set_storage!(binary :: "owner" => tx!(sender));
 }
 
 #[action]
@@ -17,6 +17,6 @@ fn counter(step: Integer) {
 #[action]
 fn restore_counter(new_count: Integer) {
     let owner: Binary = get_storage!(binary :: "owner");
-    require!(equals!(binary :: owner, get_tx_sender!()));
+    require!(equals!(binary :: owner, tx!(sender)));
     set_storage!(integer :: "count" => new_count);
 }
