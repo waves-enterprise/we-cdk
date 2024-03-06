@@ -44,3 +44,16 @@ fn _constructor() {
         i_contract(contract)::payment_fn()::payments(payment_system_token, payment)
     }
 }
+
+// If there is no way to define the contract interface in advance,
+// a raw contract call can be used.
+// To do this, you only need to know the name of the function and pass the parameters with binary type
+#[action]
+fn call_with_binary_params(func_name: String, params: Binary) {
+    // Converting a string address to a byte address.
+    let contract = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
+
+    call_contract! {
+        (contract)::call(func_name, params)
+    }
+}

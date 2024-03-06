@@ -14,7 +14,7 @@ fn _constructor(
     set_storage!(integer :: "int_value" => int_value);
     set_storage!(string :: "string_value" => string_value);
     set_storage!(binary :: "address_value" => base58!(address_value));
-    set_storage!(binary :: "owner" => get_tx_sender!());
+    set_storage!(binary :: "owner" => tx!(sender));
 }
 
 #[action]
@@ -26,7 +26,7 @@ fn update_storage(
 ) {
     // Check owner
     let owner: Binary = get_storage!(binary :: "owner");
-    require!(equals!(binary :: owner, get_tx_sender!()));
+    require!(equals!(binary :: owner, tx!(sender)));
 
     // Update storage
     set_storage!(boolean :: "bool_value" => bool_value);
