@@ -34,7 +34,7 @@ extern "C" {
         is_reissuable: bool,
     ) -> (i32, *const u8, usize);
 
-    // Payments
+    // Tx
     #[no_mangle]
     pub fn get_tx_payments() -> (i32, i64);
 
@@ -43,4 +43,7 @@ extern "C" {
 
     #[no_mangle]
     pub fn get_tx_payment_amount(number: i64) -> (i32, i64);
+
+    #[no_mangle]
+    pub fn tx(offset_field: *const u8, length_field: usize) -> (i32, *const u8, usize);
 }

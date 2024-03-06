@@ -72,6 +72,33 @@ extern "C" {
         length_func_name: usize,
     ) -> i32;
 
+    #[no_mangle]
+    pub fn call_contract_params(
+        offset_contract_id: *const u8,
+        length_contract_id: usize,
+        offset_func_name: *const u8,
+        length_func_name: usize,
+        offset_params: *const u8,
+        length_params: usize,
+    ) -> i32;
+
+    // Crypto
+    #[no_mangle]
+    pub fn fast_hash(offset_bytes: *const u8, length_bytes: usize) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn secure_hash(offset_bytes: *const u8, length_bytes: usize) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn sig_verify(
+        offset_message: *const u8,
+        length_message: usize,
+        offset_signature: *const u8,
+        length_signature: usize,
+        offset_public_key: *const u8,
+        length_public_key: usize,
+    ) -> (i32, bool);
+
     // Lease
     #[no_mangle]
     pub fn lease_address(
@@ -89,16 +116,6 @@ extern "C" {
 
     #[no_mangle]
     pub fn cancel_lease(offset_lease_id: *const u8, length_lease_id: usize) -> i32;
-
-    // Payments
-    #[no_mangle]
-    pub fn get_tx_payments() -> (i32, i32);
-
-    #[no_mangle]
-    pub fn get_tx_payment_asset_id(number: i32) -> (i32, *const u8, usize);
-
-    #[no_mangle]
-    pub fn get_tx_payment_amount(number: i32) -> (i32, i64);
 
     // Storage
     #[no_mangle]
@@ -159,6 +176,15 @@ extern "C" {
     #[no_mangle]
     pub fn get_tx_sender() -> (i32, *const u8, usize);
 
+    #[no_mangle]
+    pub fn get_tx_payments() -> (i32, i32);
+
+    #[no_mangle]
+    pub fn get_tx_payment_asset_id(number: i32) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn get_tx_payment_amount(number: i32) -> (i32, i64);
+
     // Utils
     #[no_mangle]
     pub fn base_58(offset_bytes: *const u8, length_bytes: usize) -> (i32, *const u8, usize);
@@ -192,4 +218,10 @@ extern "C" {
         offset_right: *const u8,
         length_right: usize,
     ) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn to_le_bytes(offset_bytes: *const u8, length_bytes: usize) -> (i32, *const u8, usize);
+
+    #[no_mangle]
+    pub fn caller() -> (i32, *const u8, usize);
 }
