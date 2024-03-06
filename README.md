@@ -38,6 +38,42 @@ cargo we build
 
 As a result you'll get a `target/we/flipper.wasm` file and a `flipper.json` file in the `target/we` folder of your contract.
 
+## Create & Update contract
+
+With `cargo-we` can also send `CreateContract` and `UpdateContract` transactions directly to a network node.
+
+To do this, create a file with a description of access to the node and the transaction to be sent.
+
+To send a transaction, all you need to do is execute the command:
+```
+cargo we tx --send --path_json=<path_json>
+```
+
+Example JSON file:
+
+```json
+{
+    "nodeUrl": "http://localhost:6862",
+    "apiKey": "we",
+    "transaction": {
+        "contractId": "FofPw6DRQVhYVsYQzsFEWDBrJpS1GVFLS7vGHajuQUtD",
+        "fee" : 100000000,
+        "payments" : [ ],
+        "groupOwners" : [ ],
+        "type" : 107,
+        "version" : 6,
+        "groupParticipants" : [ ],
+        "sender" : "3NgoqC9HdDfTYJtKjcW2v3LeTdd2uyhimVo",
+        "feeAssetId" : null,
+        "contractName" : "name",
+        "validationPolicy" : {
+            "type": "any"
+        }
+    }
+}
+
+```
+
 ## Hello, World! ‒ The Flipper
 
 The `Flipper` contract is a simple contract containing only a single `bool` value.
