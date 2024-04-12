@@ -12,7 +12,7 @@
 #[macro_export]
 macro_rules! fast_hash {
     ($bytes:expr) => {{
-        let (error, ptr, len) = bindings::v0::fast_hash($bytes.as_ptr(), $bytes.len());
+        let (error, ptr, len) = wevm::v0::bindings::fast_hash($bytes.as_ptr(), $bytes.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};
@@ -32,7 +32,7 @@ macro_rules! fast_hash {
 #[macro_export]
 macro_rules! secure_hash {
     ($bytes:expr) => {{
-        let (error, ptr, len) = bindings::v0::secure_hash($bytes.as_ptr(), $bytes.len());
+        let (error, ptr, len) = wevm::v0::bindings::secure_hash($bytes.as_ptr(), $bytes.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};
@@ -46,13 +46,16 @@ macro_rules! secure_hash {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let hash: Binary = fast_hash!("6Tn7ir9MycHW6Gq2F2dGok2stokSwXJadPh4hW8eZ8Sp");
+///     let message = "uncle";
+///     let signature: Binary = base58!("B4ViRpS6wZ73hhTtP4hhrfV46rR3uoUn7jgsH5yfkKMpbJUxMmu48jf3QSdibRkQBN7Tkx9jReKDq1Rmp9acxPG");
+///     let public_key: Binary = base58!("4KxUVD9NtyRJjU3BCvPgJSttoJX7cb3DMdDTNucLN121");
+///     let result: Boolean = sig_verify!(message, signature, public_key);
 /// }
 /// ```
 #[macro_export]
 macro_rules! sig_verify {
     ($message:expr, $signature:expr, $public_key: expr) => {{
-        let (error, ptr, len) = bindings::v0::sig_verify(
+        let (error, result) = wevm::v0::bindings::sig_verify(
             $message.as_ptr(),
             $message.len(),
             $signature.as_ptr(),
@@ -61,6 +64,6 @@ macro_rules! sig_verify {
             $public_key.len(),
         );
         error!(error);
-        core::slice::from_raw_parts(ptr, len)
+        result
     }};
 }

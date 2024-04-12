@@ -1,7 +1,7 @@
 mod macros;
 
-pub use we_contract_codegen::*;
 pub use we_contract_proc_macro::*;
+pub use wevm;
 
 pub type Integer = i64;
 pub type Boolean = bool;

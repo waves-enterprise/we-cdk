@@ -13,13 +13,17 @@
 #[macro_export]
 macro_rules! block {
     (timestamp) => {{
-        let (error, value) = bindings::v0::get_block_timestamp();
+        let field = "timestamp";
+        let (error, ptr, len) = wevm::v1::bindings::block(field.as_ptr(), field.len());
         error!(error);
-        value
+        let (error, ptr, len) = wevm::v0::bindings::to_le_bytes(ptr, len);
+        *(ptr as *const i64)
     }};
     (height) => {{
-        let (error, value) = bindings::v0::get_block_height();
+        let field = "height";
+        let (error, ptr, len) = wevm::v1::bindings::block(field.as_ptr(), field.len());
         error!(error);
-        value
+        let (error, ptr, len) = wevm::v0::bindings::to_le_bytes(ptr, len);
+        *(ptr as *const i64)
     }};
 }

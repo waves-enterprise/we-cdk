@@ -1,8 +1,10 @@
 mod asset;
 mod block;
 mod call_contract;
+mod converts;
 mod crypto;
 mod lease;
+mod memory;
 mod storage;
 mod tx;
 mod utils;

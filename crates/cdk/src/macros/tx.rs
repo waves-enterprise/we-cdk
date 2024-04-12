@@ -9,13 +9,13 @@
 ///
 /// #[action]
 /// fn _constructor() {
-///     let number_payments = get_tx_payments!();
+///     let number_payments: Integer = get_tx_payments!();
 /// }
 /// ```
 #[macro_export]
 macro_rules! get_tx_payments {
     () => {{
-        let (error, value) = bindings::v1::get_tx_payments();
+        let (error, value) = wevm::v1::bindings::get_payments();
         error!(error);
         value
     }};
@@ -44,13 +44,13 @@ macro_rules! get_tx_payments {
 macro_rules! get_tx_payment {
     ($number:expr) => {{
         let asset_id = {
-            let (error, ptr, len) = bindings::v1::get_tx_payment_asset_id($number);
+            let (error, ptr, len) = wevm::v1::bindings::get_payment_asset_id($number);
             error!(error);
             core::slice::from_raw_parts(ptr, len)
         };
 
         let amount = {
-            let (error, value) = bindings::v1::get_tx_payment_amount($number);
+            let (error, value) = wevm::v1::bindings::get_payment_amount($number);
             error!(error);
             value
         };
@@ -74,13 +74,13 @@ macro_rules! get_tx_payment {
 macro_rules! tx {
     (tx_id) => {{
         let field = "txId";
-        let (error, ptr, len) = bindings::v1::tx(field.as_ptr(), field.len());
+        let (error, ptr, len) = wevm::v1::bindings::tx(field.as_ptr(), field.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};
     (sender) => {{
         let field = "sender";
-        let (error, ptr, len) = bindings::v1::tx(field.as_ptr(), field.len());
+        let (error, ptr, len) = wevm::v1::bindings::tx(field.as_ptr(), field.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};

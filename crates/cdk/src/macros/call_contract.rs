@@ -11,8 +11,8 @@
 ///
 /// #[action]
 /// fn _constructor() {
-///     let contract = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
-///     let asset = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///     let contract: Binary = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
+///     let asset: Binary = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
 ///
 ///     let integer: Integer = 42;
 ///     let boolean: Boolean = true;
@@ -32,7 +32,7 @@
 ///
 /// #[action]
 /// fn call_with_binary_params(func_name: String, params: Binary) {
-///     let contract = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
+///     let contract: Binary = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
 ///
 ///     call_contract! {
 ///         (contract)::call(func_name, params)
@@ -44,7 +44,7 @@ macro_rules! call_contract {
     ($interface:ident ( $contract_id:expr ) :: $func_name:ident ( $($func_args:expr),* ) $(:: payments ( $($payment_args:expr),+ ))?) => {
         $(
             $(
-                let error = bindings::v0::call_payment($payment_args.0.as_ptr(), $payment_args.0.len(), $payment_args.1);
+                let error = wevm::v0::bindings::call_payment($payment_args.0.as_ptr(), $payment_args.0.len(), $payment_args.1);
                 error!(error);
             )+
         )?
@@ -54,11 +54,11 @@ macro_rules! call_contract {
     ( ($contract_id:expr) :: call ($func_name:expr, $params:expr ) $(:: payments ( $($payment_args:expr),+ ))?) => {
         $(
             $(
-                let error = bindings::v0::call_payment($payment_args.0.as_ptr(), $payment_args.0.len(), $payment_args.1);
+                let error = wevm::v0::bindings::call_payment($payment_args.0.as_ptr(), $payment_args.0.len(), $payment_args.1);
                 error!(error);
             )+
         )?
-        let error = bindings::v0::call_contract_params(
+        let error = wevm::v0::bindings::call_contract_params(
             $contract_id.as_ptr(),
             $contract_id.len(),
             $func_name.as_ptr(),

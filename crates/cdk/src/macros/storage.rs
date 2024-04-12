@@ -1,3 +1,38 @@
+/// Checks if a record with this key exists
+///
+/// # Usage
+/// ```
+/// use we_cdk::*;
+///
+/// #[action]
+/// fn _constructor() {
+///     let address = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
+///
+///     let result: Boolean = contains_key!("boolean_key");
+///     let result: Boolean = contains_key!(address => "integer_key");
+/// }
+/// ```
+#[macro_export]
+macro_rules! contains_key {
+    ($key:expr) => {{
+        let this = internal_data!(this);
+        let (error, result) =
+            wevm::v0::bindings::contains_key(this.0, this.1, $key.as_ptr(), $key.len());
+        error!(error);
+        result
+    }};
+    ($address:expr => $key:expr) => {{
+        let (error, result) = wevm::v0::bindings::contains_key(
+            $address.as_ptr(),
+            $address.len(),
+            $key.as_ptr(),
+            $key.len(),
+        );
+        error!(error);
+        result
+    }};
+}
+
 /// Get storage
 ///
 /// # Usage
@@ -21,12 +56,12 @@ macro_rules! get_storage {
     (integer :: $key:expr) => {{
         let this = internal_data!(this);
         let (error, value) =
-            bindings::v0::get_storage_int(this.0, this.1, $key.as_ptr(), $key.len());
+            wevm::v0::bindings::get_storage_int(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         value
     }};
     (integer :: $address:expr => $key:expr) => {{
-        let (error, value) = bindings::v0::get_storage_int(
+        let (error, value) = wevm::v0::bindings::get_storage_int(
             $address.as_ptr(),
             $address.len(),
             $key.as_ptr(),
@@ -38,12 +73,12 @@ macro_rules! get_storage {
     (boolean :: $key:expr) => {{
         let this = internal_data!(this);
         let (error, value) =
-            bindings::v0::get_storage_bool(this.0, this.1, $key.as_ptr(), $key.len());
+            wevm::v0::bindings::get_storage_bool(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         value
     }};
     (boolean :: $address:expr => $key:expr) => {{
-        let (error, value) = bindings::v0::get_storage_bool(
+        let (error, value) = wevm::v0::bindings::get_storage_bool(
             $address.as_ptr(),
             $address.len(),
             $key.as_ptr(),
@@ -55,12 +90,12 @@ macro_rules! get_storage {
     (binary :: $key:expr) => {{
         let this = internal_data!(this);
         let (error, ptr, len) =
-            bindings::v0::get_storage_binary(this.0, this.1, $key.as_ptr(), $key.len());
+            wevm::v0::bindings::get_storage_binary(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)
     }};
     (binary :: $address:expr => $key:expr) => {{
-        let (error, ptr, len) = bindings::v0::get_storage_binary(
+        let (error, ptr, len) = wevm::v0::bindings::get_storage_binary(
             $address.as_ptr(),
             $address.len(),
             $key.as_ptr(),
@@ -72,13 +107,13 @@ macro_rules! get_storage {
     (string :: $key:expr) => {{
         let this = internal_data!(this);
         let (error, ptr, len) =
-            bindings::v0::get_storage_string(this.0, this.1, $key.as_ptr(), $key.len());
+            wevm::v0::bindings::get_storage_string(this.0, this.1, $key.as_ptr(), $key.len());
         error!(error);
         let bytes = core::slice::from_raw_parts(ptr, len);
         core::str::from_utf8_unchecked(bytes)
     }};
     (string :: $address:expr => $key:expr) => {{
-        let (error, ptr, len) = bindings::v0::get_storage_string(
+        let (error, ptr, len) = wevm::v0::bindings::get_storage_string(
             $address.as_ptr(),
             $address.len(),
             $key.as_ptr(),
@@ -107,15 +142,15 @@ macro_rules! get_storage {
 #[macro_export]
 macro_rules! set_storage {
     (integer :: $key:expr => $value:expr) => {{
-        let error = bindings::v0::set_storage_int($key.as_ptr(), $key.len(), $value);
+        let error = wevm::v0::bindings::set_storage_int($key.as_ptr(), $key.len(), $value);
         error!(error);
     }};
     (boolean :: $key:expr => $value:expr) => {
-        let error = bindings::v0::set_storage_bool($key.as_ptr(), $key.len(), $value);
+        let error = wevm::v0::bindings::set_storage_bool($key.as_ptr(), $key.len(), $value);
         error!(error);
     };
     (binary :: $key:expr => $value:expr) => {
-        let error = bindings::v0::set_storage_binary(
+        let error = wevm::v0::bindings::set_storage_binary(
             $key.as_ptr(),
             $key.len(),
             $value.as_ptr(),
@@ -124,7 +159,7 @@ macro_rules! set_storage {
         error!(error);
     };
     (string :: $key:expr => $value:expr) => {
-        let error = bindings::v0::set_storage_string(
+        let error = wevm::v0::bindings::set_storage_string(
             $key.as_ptr(),
             $key.len(),
             $value.as_ptr(),

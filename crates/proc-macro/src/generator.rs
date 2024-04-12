@@ -10,13 +10,13 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
     let mod_name = input.ident;
 
     for item in input.items {
-        if let syn::TraitItem::Method(method) = item {
-            let func_name_str = method.sig.ident.to_string();
-            let func_name = method.sig.ident;
+        if let syn::TraitItem::Fn(func) = item {
+            let func_name_str = func.sig.ident.to_string();
+            let func_name = func.sig.ident;
 
             let mut args: Vec<TokenStream2> = vec![];
             let mut call_args: Vec<TokenStream2> = vec![];
-            for arg in method.sig.inputs.iter() {
+            for arg in func.sig.inputs.iter() {
                 if let syn::FnArg::Typed(a) = arg {
                     if let syn::Pat::Ident(pat_ident) = &*a.pat {
                         let arg_name = &pat_ident.ident;
@@ -31,7 +31,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        bindings::v0::call_arg_int(#arg_name);
+                                        wevm::v0::bindings::call_arg_int(#arg_name);
                                     ));
                                 }
                                 "Boolean" => {
@@ -40,7 +40,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        bindings::v0::call_arg_bool(#arg_name);
+                                        wevm::v0::bindings::call_arg_bool(#arg_name);
                                     ));
                                 }
                                 "Binary" => {
@@ -49,7 +49,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        let error = bindings::v0::call_arg_binary(#arg_name.as_ptr(), #arg_name.len());
+                                        let error = wevm::v0::bindings::call_arg_binary(#arg_name.as_ptr(), #arg_name.len());
                                         if error != 0 {
                                             return error;
                                         }
@@ -61,7 +61,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                                     ));
 
                                     call_args.push(quote!(
-                                        let error = bindings::v0::call_arg_string(#arg_name.as_ptr(), #arg_name.len());
+                                        let error = wevm::v0::bindings::call_arg_string(#arg_name.as_ptr(), #arg_name.len());
                                         if error != 0 {
                                             return error;
                                         }
@@ -78,7 +78,7 @@ pub fn interface(input: TokenStream2) -> Result<TokenStream2, syn::Error> {
                 pub fn #func_name(contract_id: &[u8], #( #args ),*) -> i32 {
                     unsafe {
                         #( #call_args )*
-                        bindings::v0::call_contract(contract_id.as_ptr(), contract_id.len(), #func_name_str.as_ptr(), #func_name_str.len())
+                        wevm::v0::bindings::call_contract(contract_id.as_ptr(), contract_id.len(), #func_name_str.as_ptr(), #func_name_str.len())
                     }
                 }
             ));
