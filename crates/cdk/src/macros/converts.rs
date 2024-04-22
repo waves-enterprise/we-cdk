@@ -120,3 +120,21 @@ macro_rules! to_string_int {
         core::str::from_utf8_unchecked(bytes)
     }};
 }
+
+/// Converts an binary to a string
+///
+/// # Usage
+/// ```
+/// use we_cdk::*;
+///
+/// #[action]
+/// fn _constructor() {
+///     let result: String = to_string_binary!(&[0, 1]);
+/// }
+/// ```
+#[macro_export]
+macro_rules! to_string_binary {
+    ($value:expr) => {{
+        core::str::from_utf8_unchecked($value)
+    }};
+}
