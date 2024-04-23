@@ -3,13 +3,11 @@
 use we_cdk::*;
 
 const PREFIX_KEY: String = "shard_";
-const NUMBERS: String = "0123456789";
 
 #[action]
 fn _constructor() {
     for i in 0..10 {
-        let x = NUMBERS.get_unchecked(i..i + 1);
-        let key = join!(string :: PREFIX_KEY, &x);
+        let key = join!(string :: PREFIX_KEY, to_string_int!(i));
         set_storage!(integer :: key => 0);
     }
 }

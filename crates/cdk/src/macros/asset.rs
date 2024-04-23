@@ -9,17 +9,17 @@
 ///
 /// #[action]
 /// fn _constructor() {
-///     let token = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
-///     let another_address = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
-///     let another_alias = "alias";
-///     let another_contract = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
+///     let token: Binary = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///     let another_address: Binary = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
+///     let another_alias: String = "alias";
+///     let another_contract: Binary = base58!("4WVhw3QdiinpE5QXDG7QfqLiLanM7ewBw4ChX4qyGjs2");
 ///
-///     let contract_balance = get_balance!(this);
-///     let contract_asset_balance = get_balance!(this, asset => token);
-///     let address_balance = get_balance!(address => another_address);
-///     let alias_balance = get_balance!(alias => another_alias);
-///     let contract_balance = get_balance!(contract => another_contract);
-///     let address_asset_balance = get_balance!(address => another_address, asset => token);
+///     let contract_balance: Integer = get_balance!(this);
+///     let contract_asset_balance: Integer = get_balance!(this, asset => token);
+///     let address_balance: Integer = get_balance!(address => another_address);
+///     let alias_balance: Integer = get_balance!(alias => another_alias);
+///     let contract_balance: Integer = get_balance!(contract => another_contract);
+///     let address_asset_balance: Integer = get_balance!(address => another_address, asset => token);
 /// }
 /// ```
 #[macro_export]
@@ -27,7 +27,7 @@ macro_rules! get_balance {
     // For use within a macro
     (@inner, $holder:expr, $type:expr, $version:expr) => {{
         let system_token = internal_data!(system_token);
-        let (error, balance) = bindings::v1::get_balance(
+        let (error, balance) = wevm::v1::bindings::get_balance(
             system_token.0,
             system_token.1,
             $holder.as_ptr(),
@@ -40,7 +40,7 @@ macro_rules! get_balance {
     }};
     // For use within a macro
     (@inner, $holder:expr, $asset_id:expr, $type:expr, $version:expr) => {{
-        let (error, balance) = bindings::v1::get_balance(
+        let (error, balance) = wevm::v1::bindings::get_balance(
             $asset_id.as_ptr(),
             $asset_id.len(),
             $holder.as_ptr(),
@@ -55,14 +55,14 @@ macro_rules! get_balance {
         let system_token = internal_data!(system_token);
         let this = internal_data!(this);
         let (error, balance) =
-            bindings::v0::get_balance(system_token.0, system_token.1, this.0, this.1);
+            wevm::v0::bindings::get_balance(system_token.0, system_token.1, this.0, this.1);
         error!(error);
         balance
     }};
     (this, asset => $asset_id:expr) => {{
         let this = internal_data!(this);
         let (error, balance) =
-            bindings::v0::get_balance($asset_id.as_ptr(), $asset_id.len(), this.0, this.1);
+            wevm::v0::bindings::get_balance($asset_id.as_ptr(), $asset_id.len(), this.0, this.1);
         error!(error);
         balance
     }};
@@ -94,9 +94,9 @@ macro_rules! get_balance {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let asset_id = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
-///     let recipient = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
-///     let amount: i64 = 100;
+///     let asset_id: Binary = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///     let recipient: Binary = base58!("3NzkzibVRkKUzaRzjUxndpTPvoBzQ3iLng3");
+///     let amount: Integer = 100;
 ///     transfer!(address => recipient, amount);
 ///     transfer!(asset => asset_id, address => recipient, amount);
 /// }
@@ -106,7 +106,7 @@ macro_rules! transfer {
     // For use within a macro
     (@inner, $recipient:expr, $amount:expr, $type:expr, $version:expr) => {
         let system_token = internal_data!(system_token);
-        let error = bindings::v1::transfer(
+        let error = wevm::v1::bindings::transfer(
             system_token.0,
             system_token.1,
             $recipient.as_ptr(),
@@ -119,7 +119,7 @@ macro_rules! transfer {
     };
     // For use within a macro
     (@inner, $asset_id:expr, $recipient:expr, $amount:expr, $type:expr, $version:expr) => {
-        let error = bindings::v1::transfer(
+        let error = wevm::v1::bindings::transfer(
             $asset_id.as_ptr(),
             $asset_id.len(),
             $recipient.as_ptr(),
@@ -161,18 +161,18 @@ macro_rules! transfer {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let name = "TEST";
-///     let description = "Test asset";
-///     let quantity = 1_000_000;
-///     let decimals = 8;
-///     let is_reissuable = true;
-///     let asset_id = issue!(name, description, quantity, decimals, is_reissuable);
+///     let name: String = "TEST";
+///     let description: String = "Test asset";
+///     let quantity: Integer = 1_000_000;
+///     let decimals: Integer = 8;
+///     let is_reissuable: Boolean = true;
+///     let asset_id: Binary = issue!(name, description, quantity, decimals, is_reissuable);
 /// }
 /// ```
 #[macro_export]
 macro_rules! issue {
     ($name:expr, $description:expr, $quantity:expr, $decimals:expr, $is_reissuable:expr) => {{
-        let (error, ptr, len) = bindings::v1::issue(
+        let (error, ptr, len) = wevm::v1::bindings::issue(
             $name.as_ptr(),
             $name.len(),
             $description.as_ptr(),
@@ -194,15 +194,15 @@ macro_rules! issue {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let asset_id = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
-///     let amount = 100;
+///     let asset_id: Binary = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///     let amount: Integer = 100;
 ///     burn!(asset_id, amount);
 /// }
 /// ```
 #[macro_export]
 macro_rules! burn {
     ($asset_id:expr, $amount:expr) => {
-        let error = bindings::v0::burn($asset_id.as_ptr(), $asset_id.len(), $amount);
+        let error = wevm::v0::bindings::burn($asset_id.as_ptr(), $asset_id.len(), $amount);
         error!(error);
     };
 }
@@ -215,17 +215,21 @@ macro_rules! burn {
 ///
 /// #[action]
 /// fn _constructor() {
-///     let asset_id = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
-///     let amount = 100;
-///     let is_reissuable = true;
+///     let asset_id: Binary = base58!("DnK5Xfi2wXUJx9BjK9X6ZpFdTLdq2GtWH9pWrcxcmrhB");
+///     let amount: Integer = 100;
+///     let is_reissuable: Boolean = true;
 ///     reissue!(asset_id, amount, is_reissuable);
 /// }
 /// ```
 #[macro_export]
 macro_rules! reissue {
     ($asset_id:expr, $amount:expr, $is_reissuable:expr) => {
-        let error =
-            bindings::v0::reissue($asset_id.as_ptr(), $asset_id.len(), $amount, $is_reissuable);
+        let error = wevm::v0::bindings::reissue(
+            $asset_id.as_ptr(),
+            $asset_id.len(),
+            $amount,
+            $is_reissuable,
+        );
         error!(error);
     };
 }
