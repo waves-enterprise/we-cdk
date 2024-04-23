@@ -1,5 +1,8 @@
 # we-cdk
 
+we-cdk [![crates.io](https://img.shields.io/crates/v/we-cdk.svg)](https://crates.io/crates/we-cdk)
+cargo-we [![crates.io](https://img.shields.io/crates/v/cargo-we.svg)](https://crates.io/crates/cargo-we)
+
 Toolkit for development WASM smart-contracts on Waves Enterprise ecosystem.
 
 ## Usage
