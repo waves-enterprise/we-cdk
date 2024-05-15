@@ -1,6 +1,5 @@
-//! `````no_test
-#![doc = include_str!("../README.md")]
-//! `````
+#![cfg_attr(not(doctest), doc = include_str!("../README.md"))]
+
 pub mod macros;
 
 pub use we_contract_proc_macro::*;
