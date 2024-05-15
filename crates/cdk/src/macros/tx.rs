@@ -68,6 +68,7 @@ macro_rules! get_tx_payment {
 /// fn _constructor() {
 ///     let tx_id: Binary = tx!(tx_id);
 ///     let tx_sender: Binary = tx!(sender);
+///     let tx_sender_public_key: Binary = tx!(sender_public_key);
 /// }
 /// ```
 #[macro_export]
@@ -80,6 +81,12 @@ macro_rules! tx {
     }};
     (sender) => {{
         let field = "sender";
+        let (error, ptr, len) = wevm::v1::bindings::tx(field.as_ptr(), field.len());
+        error!(error);
+        core::slice::from_raw_parts(ptr, len)
+    }};
+    (sender_public_key) => {{
+        let field = "senderPublicKey";
         let (error, ptr, len) = wevm::v1::bindings::tx(field.as_ptr(), field.len());
         error!(error);
         core::slice::from_raw_parts(ptr, len)

@@ -9,6 +9,7 @@ mod storage;
 mod tx;
 mod utils;
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! internal_data {
     (this) => {{
@@ -19,6 +20,7 @@ macro_rules! internal_data {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! error {
     ($error:expr) => {

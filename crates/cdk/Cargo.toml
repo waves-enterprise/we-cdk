@@ -1,6 +1,6 @@
 [package]
 name = "we-cdk"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
 description = "Rust library for writing Waves Enterprise smart-contracts"
@@ -12,5 +12,5 @@ repository = "https://github.com/waves-enterprise/we-cdk"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-we-contract-proc-macro = { version = "0.3.0", path = "../proc-macro" }
+we-contract-proc-macro = { version = "0.3.1", path = "../proc-macro" }
 wevm-core = { version = "0.3.2", default-features = false, features = ["bindings"] }
