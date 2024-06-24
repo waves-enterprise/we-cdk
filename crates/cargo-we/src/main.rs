@@ -131,7 +131,7 @@ panic = 'abort'
 strip = true
 
 [dependencies]
-we-cdk = "0.3"
+we-cdk = "0.4"
 "#,
         name
     )?;

@@ -43,7 +43,13 @@ macro_rules! error {
 /// #[action]
 /// fn _constructor() {
 ///     let balance = get_balance!(this);
-///     require!(balance > 0);
+///     require!(balance > 42);
+/// }
+///
+/// #[action]
+/// fn require_with_message() {
+///     let balance = get_balance!(this);
+///     require!(balance > 1337, "Balance is less than 1337!");
 /// }
 /// ```
 #[macro_export]
@@ -53,4 +59,14 @@ macro_rules! require {
             return 300;
         }
     };
+    ($condition:expr, $message:tt) => {
+        if !($condition) {
+            let error = wevm::v0::bindings::require($message.as_ptr(), $message.len());
+            if error != 0 {
+                return error;
+            } else {
+                return 300;
+            }
+        }
+    }
 }
