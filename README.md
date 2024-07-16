@@ -49,7 +49,7 @@ To do this, create a file with a description of access to the node and the trans
 
 To send a transaction, all you need to do is execute the command:
 ```
-cargo we tx --send --path_json=<path_json>
+cargo we tx --send <path_json>
 ```
 
 Example JSON file:
