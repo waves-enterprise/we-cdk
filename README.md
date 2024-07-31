@@ -59,22 +59,29 @@ Example JSON file:
     "nodeUrl": "http://localhost:6862",
     "apiKey": "we",
     "transaction": {
-        "contractId": "FofPw6DRQVhYVsYQzsFEWDBrJpS1GVFLS7vGHajuQUtD",
+        "type" : 103,
+        "version" : 7,
+        "sender" : "3NA9hBGoVPfJVybremiFgWN8REi9oiDydEF",
+        "password": "",
+        "contractName": "flipper",
+        "params": [
+            {
+                "type": "boolean",
+                "key": "init_value",
+                "value": false
+            }
+        ],
+        "isConfidential": false,
         "fee" : 100000000,
         "payments" : [ ],
-        "groupOwners" : [ ],
-        "type" : 107,
-        "version" : 6,
-        "groupParticipants" : [ ],
-        "sender" : "3NgoqC9HdDfTYJtKjcW2v3LeTdd2uyhimVo",
         "feeAssetId" : null,
-        "contractName" : "name",
         "validationPolicy" : {
             "type": "any"
-        }
+        },
+        "groupOwners" : [ ],
+        "groupParticipants" : [ ]
     }
 }
-
 ```
 
 ## Hello, World! ‒ The Flipper

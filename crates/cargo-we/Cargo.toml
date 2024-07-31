@@ -1,6 +1,6 @@
 [package]
 name = "cargo-we"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 authors = ["DEADBLACKCLOVER <deadblackclover@protonmail.com>"]
 description = "Setup and deployment tool for developing WASM based smart-contracts"
